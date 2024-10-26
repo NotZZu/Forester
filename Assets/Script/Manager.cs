@@ -1,70 +1,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class Manager : MonoBehaviour
 {
-    public Image[] inventoySlots; // 인벤토리 슬롯 UI 이미지를 담을 배열
+    public Image[] inventorySlots; // 인벤토리 슬롯 UI 이미지를 담을 배열
     public Text[] inventoryTexts; // 인벤토리 슬롯 수량을 표시하는 텍스트 배열
 
-    private Dictionary<Sprite, int> collectedItems = new Dictionary<Sprite, int>(); // 수집한 아이템과 수량을 저장하는 딕셔너리
+    public bool isSlowMo = false;
 
-    private Sprite soilSprite;
-    private Sprite waterSprite;
-    private Sprite woodSprite;
-
-    void Start()
+    internal void Collect(itemGrp item)
     {
-        // 이미지 로드 (경로에 확장자 제거)
-        soilSprite = Resources.Load<Sprite>("Art/soil");
-        waterSprite = Resources.Load<Sprite>("Art/water");
-        woodSprite = Resources.Load<Sprite>("Art/wood");
-    }
-
-    public void Collect(GameObject item)
-    {
-        Sprite itemSprite = null;
-        if (item.name == "흙")
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            itemSprite = soilSprite;
-        }
-        else if (item.name == "물")
-        {
-            itemSprite = waterSprite;
-        }
-        else if (item.name == "나무")
-        {
-            itemSprite = woodSprite;
-        }
-
-        if (itemSprite != null)
-        {
-            // 이미 수집된 아이템인지 확인하고, 수량 증가
-            if (collectedItems.ContainsKey(itemSprite))
+            if (inventorySlots[i].sprite == item.itemSprite)
             {
-                collectedItems[itemSprite]++;
-            }
-            else
-            {
-                collectedItems[itemSprite] = 1;
-            }
-            UpdateInventoryUI();
-        }
-    }
-
-    void UpdateInventoryUI()
-    {
-        int i = 0;
-        foreach (var item in collectedItems)
-        {
-            if (i < inventoySlots.Length)
-            {
-                inventoySlots[i].sprite = item.Key;
-                inventoySlots[i].enabled = true;
-                inventoryTexts[i].text = item.Value.ToString();
+                inventorySlots[i].sprite = item.itemSprite;
+                inventorySlots[i].enabled = true;
+                inventoryTexts[i].text = item.itemCount.ToString();
                 inventoryTexts[i].enabled = true;
-                i++;
+                return;
             }
+            if (inventorySlots[i].sprite == null)
+            {
+                // 존재하지 않는 아이템이면 새로운 아이템 추가
+                inventorySlots[i].sprite = item.itemSprite;
+                inventorySlots[i].enabled = true;
+                inventoryTexts[i].text = item.itemCount.ToString();
+                inventoryTexts[i].enabled = true;
+                break;
+            }
+        }
+    }
+
+
+        void Update()
+    {
+        if (isSlowMo == false)
+        {
+            Time.timeScale = 0.1f;
+        }
+        else
+        {
+            Time.timeScale = 1.0f;
         }
     }
 }

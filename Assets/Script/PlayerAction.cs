@@ -1,7 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
+    internal class itemGrp
+    {
+        internal string itemName;
+        internal Sprite itemSprite;
+        internal int itemCount;
+        internal List<GameObject> itemList;
+        public itemGrp(string n, Sprite s, int c, List<GameObject> l)
+        {
+            itemName = n;
+            itemSprite = s;
+            itemCount = c;
+            itemList = l;
+        }
+    }
 public class PlayerAction : MonoBehaviour
 {
     public float Speed;
@@ -17,6 +34,11 @@ public class PlayerAction : MonoBehaviour
     bool hDown, hUp;
     bool vDown, vUp;
     Vector3 dirVec;
+
+    internal List<itemGrp> Bag = new();
+    [SerializeField] GameObject bag;
+
+    [SerializeField] Item ItemManager;
 
     void Awake()
     {
@@ -71,17 +93,6 @@ public class PlayerAction : MonoBehaviour
             collectPanel.SetActive(false);
         }
 
-        Vector3 ve = new Vector3(h, v);
-        //rigid.linearVelocity = new Vector2(h, v) * Speed;
-        transform.position = ve.normalized * Speed * Time.deltaTime + transform.position;
-    }
-
-    void FixedUpdate()
-    {
-        //Vector3 ve = new Vector3(h, v);
-        ////rigid.linearVelocity = new Vector2(h, v) * Speed;
-        //transform.position = ve.normalized * Speed + transform.position;
-
         Debug.DrawRay(transform.position, dirVec * 1.2f, new Color(0, 0, 0));
 
 
@@ -97,10 +108,25 @@ public class PlayerAction : MonoBehaviour
             scanObject = null;
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && scanObject != null)
         {
-            manager.Collect(scanObject);
+            //scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, scanObject);
+            ItemManager.DropObject(transform.position, hit.point, scanObject);
+            //manager.Collect(scanObject);
         }
+
+        //Vector3 ve = new Vector3(h, v);
+        //rigid.linearVelocity = new Vector2(h, v) * Speed;
+        //transform.position = ve.normalized * Speed * Time.deltaTime + transform.position;
+    }
+
+    void FixedUpdate()
+    {
+        //Vector3 ve = new Vector3(h, v);
+        rigid.linearVelocity = new Vector2(h, v) * Speed;
+        //transform.position = ve.normalized * Speed + transform.position;
+
+
     }
     public Vector3 _smoothCamera;  // SmoothDamp 메소드 참조용(ref) 변수
 
@@ -116,5 +142,60 @@ public class PlayerAction : MonoBehaviour
             // 매 프레임마다 카메라가 플레이어를 부드럽게 추적
             //camera.transform.position = Vector3.SmoothDamp(camera.transform.position, transform.position + Vector3.back * 10, ref _smoothCamera, 0.1f);
         }
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.transform.tag == "Tree")
+        {
+            collision.enabled = false;
+            collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
+            StartCoroutine(ItemAbsorb(collision.transform));
+            GetItem(collision);
+        }
+        if (collision.transform.tag == "Water" || collision.transform.tag == "Soil")
+        {
+            collision.enabled = false;
+            collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
+            StartCoroutine(ItemAbsorb(collision.transform));
+            GetItem(collision);
+        }
+    }
+    IEnumerator ItemAbsorb(Transform itemPos)
+    {
+        Vector2 here = itemPos.position;
+        float coolDown = 0;
+        while (coolDown <= 1)
+        {
+            coolDown += Time.deltaTime;
+            itemPos.position = Vector2.Lerp(here, transform.position , Mathf.Pow(coolDown, 2));
+            itemPos.localScale = new Vector3(1 - coolDown, 1 - coolDown, 0.5f);
+            yield return null;
+        }
+        
+    }
+    void GetItem(Collider2D collision)
+    {
+        bool isFound = false;
+        itemGrp item = null;
+        collision.transform.SetParent(bag.transform);
+        ItemInfo itemInfo = collision.GetComponent<ItemInfo>();
+        for (int i = 0; i < Bag.Count; i++)
+        {
+            if (Bag[i].itemName == itemInfo.itemName)
+            {
+                Bag[i].itemList.Add(collision.gameObject);
+                Bag[i].itemCount++;
+                isFound = true;
+                item = Bag[i];
+                break;
+            }
+        }
+        if (isFound != true)
+        {
+            item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { collision.gameObject });
+            Bag.Add(item);
+            
+        }
+        manager.Collect(item);
     }
 }
