@@ -39,6 +39,9 @@ public class PlayerAction : MonoBehaviour
     [SerializeField] GameObject bag;
 
     [SerializeField] Item ItemManager;
+    [SerializeField] CraftScroll craftScroll;
+
+    [SerializeField] GameObject realBag;
 
     void Awake()
     {
@@ -96,7 +99,7 @@ public class PlayerAction : MonoBehaviour
         Debug.DrawRay(transform.position, dirVec * 1.2f, new Color(0, 0, 0));
 
 
-        LayerMask combinedMask = (1 << 8) | (1 << 7) | (1 << 9);
+        LayerMask combinedMask = (1 << 8) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dirVec, 1.2f, combinedMask);
 
         if (hit.collider != null)
@@ -113,6 +116,15 @@ public class PlayerAction : MonoBehaviour
             //scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, scanObject);
             ItemManager.DropObject(transform.position, hit.point, scanObject);
             //manager.Collect(scanObject);
+        }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            manager.ToggleExpansion();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            craftScroll.ToggleScroll();
         }
 
         //Vector3 ve = new Vector3(h, v);
@@ -145,20 +157,21 @@ public class PlayerAction : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.transform.tag == "Tree")
+        ItemInfo itemInfo = collision.GetComponent<ItemInfo>();
+        if (itemInfo != null)
         {
             collision.enabled = false;
             collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
             StartCoroutine(ItemAbsorb(collision.transform));
             GetItem(collision);
         }
-        if (collision.transform.tag == "Water" || collision.transform.tag == "Soil")
-        {
-            collision.enabled = false;
-            collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
-            StartCoroutine(ItemAbsorb(collision.transform));
-            GetItem(collision);
-        }
+        //if ()
+        //{
+        //    collision.enabled = false;
+        //    collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
+        //    StartCoroutine(ItemAbsorb(collision.transform));
+        //    GetItem(collision);
+        //}
     }
     IEnumerator ItemAbsorb(Transform itemPos)
     {
@@ -179,6 +192,7 @@ public class PlayerAction : MonoBehaviour
         itemGrp item = null;
         collision.transform.SetParent(bag.transform);
         ItemInfo itemInfo = collision.GetComponent<ItemInfo>();
+
         for (int i = 0; i < Bag.Count; i++)
         {
             if (Bag[i].itemName == itemInfo.itemName)
@@ -190,12 +204,56 @@ public class PlayerAction : MonoBehaviour
                 break;
             }
         }
+        if (itemInfo.itemAmount <= 0)
+        {
+            DropItem(itemInfo);
+            return;
+        }
         if (isFound != true)
         {
             item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { collision.gameObject });
             Bag.Add(item);
             
         }
-        manager.Collect(item);
+        manager.Collect(item, itemInfo);
+    }
+    internal void GetItem(ItemInfo resultItem)
+    {
+        bool isFound = false;
+        itemGrp item = null;
+        resultItem.transform.SetParent(bag.transform);
+        ItemInfo itemInfo = resultItem.GetComponent<ItemInfo>();
+        for (int i = 0; i < Bag.Count; i++)
+        {
+            if (Bag[i].itemName == itemInfo.itemName)
+            {
+                Bag[i].itemList.Add(resultItem.gameObject);
+                Bag[i].itemCount++;
+                isFound = true;
+                item = Bag[i];
+                break;
+            }
+        }
+        if (isFound != true)
+        {
+            item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { resultItem.gameObject });
+            Bag.Add(item);
+
+        }
+        manager.Collect(item, itemInfo);
+    }
+    internal void DropItem(ItemInfo itemInfo)
+    {
+        for (int i = 0; i < Bag.Count; i++)
+        {
+            if (Bag[i].itemSprite == itemInfo.itemSprite)
+            {
+                Bag.RemoveAt(i);
+                ObjectPool objectPool = FindAnyObjectByType<ObjectPool>();
+                var child = realBag.transform.GetChild(i);
+                child.SetParent(objectPool.transform);
+                break;
+            }
+        }
     }
 }

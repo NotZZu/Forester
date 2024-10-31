@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class ItemInfo : MonoBehaviour
 {
-    internal Sprite itemSprite;
-    internal List<string> itemAttr = new();
-    internal int itemAmount;
-    internal string itemName;
+    [SerializeField] internal Sprite itemSprite;
+    [SerializeField] internal List<string> itemAttr = new();
+    [SerializeField] internal int itemAmount;
+    [SerializeField] internal string itemName;
     [SerializeField] CircleCollider2D circle;
 
     internal void SetProperties(Sprite s, int i, string n, params string[] l)
@@ -19,7 +19,15 @@ public class ItemInfo : MonoBehaviour
         //{
         //    itemAttr.Add(ll);
         //}
-        itemAttr.AddRange(l);
+        foreach (var prop in l)
+        {
+            if (itemAttr.Contains(prop) == true)
+            {
+                continue;
+            }
+            itemAttr.Add(prop);
+        }
+        
     }
     private void OnEnable()
     {
@@ -34,6 +42,11 @@ public class ItemInfo : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
         circle.enabled = true;
-
     }
+
+}
+public interface ICollectible
+{
+    void Collect();
+    string GetItemName();
 }
