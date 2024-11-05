@@ -33,8 +33,10 @@ public class Manager : MonoBehaviour
                 {
                     slot = inventorySlots[i].gameObject.AddComponent<ItemSlot>();
                 }
-                slot.itemInfo = itemInfo;
+                //slot.itemInfo = itemInfo;
+                slot.itemInfo.itemAmount++;
                 slot.craftPanel = craftPanel; // CraftPanel ¼³Á¤
+                
                 return;
             }
             if (inventorySlots[i].sprite == null)
@@ -64,11 +66,10 @@ public class Manager : MonoBehaviour
         {
             if (inventorySlots[i].sprite == iteminfo.itemSprite)
             {
-                int itemCount = int.Parse(inventoryTexts[i].text) - 1;
-                inventoryTexts[i].text = itemCount.ToString();
-                if (itemCount <= 0)
+                iteminfo.itemAmount--;
+                inventoryTexts[i].text = iteminfo.itemAmount.ToString();
+                if (iteminfo.itemAmount <= 0)
                 {
-                    iteminfo.itemAmount--;
                     inventorySlots[i].sprite = null;
                     inventoryTexts[i].enabled = false;
                     PlayerAction player = FindAnyObjectByType<PlayerAction>();

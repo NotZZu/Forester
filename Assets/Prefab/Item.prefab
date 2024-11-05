@@ -47,6 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d176b766f243f594c87462e2e38f5313, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemSprite: {fileID: 0}
+  itemAttr: []
+  itemAmount: 0
+  itemName: 
   circle: {fileID: 3373178650907239590}
 --- !u!212 &7937777857337763156
 SpriteRenderer:
@@ -138,7 +142,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.8
 --- !u!50 &-2269413464835444509
 Rigidbody2D:
   serializedVersion: 5

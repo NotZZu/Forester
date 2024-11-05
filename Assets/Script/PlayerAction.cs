@@ -25,7 +25,7 @@ public class PlayerAction : MonoBehaviour
     float h, v;
     Rigidbody2D rigid;
     Animator anime;
-    [SerializeField] GameObject camera; // 카메라 SerializeField로 설정
+    [SerializeField] GameObject mCamera; // 카메라 SerializeField로 설정
     float smoothSpeed = 0.125f;
     [SerializeField] GameObject collectPanel;
     [SerializeField] Text collectText; // UI Text 컴포넌트를 추가
@@ -48,7 +48,7 @@ public class PlayerAction : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         rigid.interpolation = RigidbodyInterpolation2D.Interpolate;
         anime = GetComponent<Animator>();
-        camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+        mCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     }
 
     void Update()
@@ -99,7 +99,7 @@ public class PlayerAction : MonoBehaviour
         Debug.DrawRay(transform.position, dirVec * 1.2f, new Color(0, 0, 0));
 
 
-        LayerMask combinedMask = (1 << 8) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
+        LayerMask combinedMask = (1 << 4) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
         RaycastHit2D hit = Physics2D.Raycast(transform.position, dirVec, 1.2f, combinedMask);
 
         if (hit.collider != null)
@@ -144,12 +144,12 @@ public class PlayerAction : MonoBehaviour
 
     void LateUpdate()
     {
-        if (camera != null)
+        if (mCamera != null)
         {
             Vector3 desiredPosition = transform.position;
-            desiredPosition.z = camera.transform.position.z;
-            Vector3 smoothedPosition = Vector3.Lerp(camera.transform.position, desiredPosition, smoothSpeed);
-            camera.transform.position = smoothedPosition;
+            desiredPosition.z = mCamera.transform.position.z;
+            Vector3 smoothedPosition = Vector3.Lerp(mCamera.transform.position, desiredPosition, smoothSpeed);
+            mCamera.transform.position = smoothedPosition;
 
             // 매 프레임마다 카메라가 플레이어를 부드럽게 추적
             //camera.transform.position = Vector3.SmoothDamp(camera.transform.position, transform.position + Vector3.back * 10, ref _smoothCamera, 0.1f);
@@ -190,7 +190,7 @@ public class PlayerAction : MonoBehaviour
     {
         bool isFound = false;
         itemGrp item = null;
-        collision.transform.SetParent(bag.transform);
+        
         ItemInfo itemInfo = collision.GetComponent<ItemInfo>();
 
         for (int i = 0; i < Bag.Count; i++)
@@ -211,6 +211,7 @@ public class PlayerAction : MonoBehaviour
         }
         if (isFound != true)
         {
+            collision.transform.SetParent(bag.transform);
             item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { collision.gameObject });
             Bag.Add(item);
             
@@ -221,7 +222,7 @@ public class PlayerAction : MonoBehaviour
     {
         bool isFound = false;
         itemGrp item = null;
-        resultItem.transform.SetParent(bag.transform);
+        
         ItemInfo itemInfo = resultItem.GetComponent<ItemInfo>();
         for (int i = 0; i < Bag.Count; i++)
         {
@@ -234,11 +235,11 @@ public class PlayerAction : MonoBehaviour
                 break;
             }
         }
-        if (isFound != true)
+        if (isFound == false)
         {
+            resultItem.transform.SetParent(bag.transform);
             item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { resultItem.gameObject });
             Bag.Add(item);
-
         }
         manager.Collect(item, itemInfo);
     }

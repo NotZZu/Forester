@@ -46,10 +46,6 @@ public class CraftPanel : MonoBehaviour
     }
     public void SelectedMainMaterialSlot()
     {
-        //if (mainMaterial.GetComponent<Image>().sprite != null)
-        //{
-
-        //}
         if (isSubMaterialSlotSelected == true && mainMaterialSlot.GetComponent<Image>().sprite != null)
         {
             mainMaterialSlot.GetComponent<Image>().color = Color.white;
@@ -137,6 +133,8 @@ public class CraftPanel : MonoBehaviour
             subMaterial = null;
             mainMaterialSlot.GetComponent<Image>().sprite = null;
             subMaterialSlot.GetComponent<Image>().sprite = null;
+            isMainMaterialSlotSelected = false;
+            isSubMaterialSlotSelected = false;
             craftPanel.SetActive(false);
         }
     }

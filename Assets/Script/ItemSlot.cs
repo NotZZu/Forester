@@ -25,11 +25,11 @@ public class ItemSlot : MonoBehaviour
                     manager.ItemDecline(itemInfo);
                     return;
                 }
-                
                 if (craftPanel.SetMainMaterial(itemInfo))
                 {
                     manager.ItemDecline(itemInfo);
                 }
+
             }
             else if(craftPanel.IsSubMaterialSlotSelected == true)
             {
@@ -42,6 +42,7 @@ public class ItemSlot : MonoBehaviour
                 {
                     manager.ItemDecline(itemInfo);
                 }
+
             }
         }
     }
