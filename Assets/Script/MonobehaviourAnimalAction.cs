@@ -1,72 +1,75 @@
-using NavMeshPlus.Components;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 
-public class MonobehaviourAnimalAction : MonoBehaviour/*, IAttackable*/
+public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 {
-    [SerializeField] float detectRange;
-    [SerializeField] int playerLayer;
-    private bool isPlayerDetected = false;
-    private Transform PlayerTransform;
-    [SerializeField] float Speed;
-    Animator anime;
-    private Vector2 spawnPosition;
-    
+    [SerializeField] float _detectRange;
+    [SerializeField] int _playerLayer;
+    bool _isPlayerDetected = false;
+    Transform _playerTransform;
+    [SerializeField] float _speed;
+    Animator _anime;
+    Vector2 _spawnPosition;
+    [SerializeField] float _knockBackPower;
+    bool _isAttack;
 
-    private bool lastDetect = false;
-    float hVectorThink;
-    float vVectorThink;
-    float ThinkTime;
-    private bool isThinking = false;
-    Vector2 targetPosition;
-    Vector2 nextMovePosition;
+
+    bool _lastDetect = false;
+    float _hVectorThink;
+    float _vVectorThink;
+    float _thinkTime;
+    bool _isThinking = false;
+    Vector2 _targetPosition;
+    Vector2 _nextMovePosition;
     Vector3 TargetPosition
     {
-        get { return targetPosition; }
+        get { return _targetPosition; }
         set
         {
-            if (HomecomingLock == false)
+            if (_homecomingLock == false)
             {
-                targetPosition = value;
+                _targetPosition = value;
             }
         }
     }
-    private bool ThinkLock;
-    private bool HomecomingLock;
+    bool _thinkLock;
+    bool _homecomingLock;
 
-    private int ObstacleLayer;
+    int _obstacleLayer;
 
-    [SerializeField] float AreaOutCount;
-    float AreaOutCoolDown;
-    [SerializeField] Vector2 AreaSize;
+    [SerializeField] float _areaOutCount;
+    float _areaOutCoolDown;
+    [SerializeField] Vector2 _areaSize;
 
-    private float HomecomingCheckCount = 0.25f;
-    private float HomecomingCheckCoolDown;
+    float _homecomingCheckCount = 0.25f;
+    float _homecomingCheckCoolDown;
 
-    [SerializeField] Vector2 BoxForRay;
+    [SerializeField] Vector2 _boxForRay;
 
-    RaycastHit2D[] hits = { };
+    bool _isAttacked;
+
+    RaycastHit2D[] _hitArr = { };
     void Awake()
     {
-        playerLayer = LayerMask.GetMask("Player");
-        ObstacleLayer = LayerMask.GetMask("Tree", "Water", "Stone");
-        anime = GetComponent<Animator>();
-        spawnPosition = transform.position; // 스폰 위치 저장
+        _playerLayer = LayerMask.GetMask("Player");
+        _obstacleLayer = LayerMask.GetMask("Tree", "Water", "Stone");
+        _anime = GetComponent<Animator>();
+        _spawnPosition = transform.position; // 스폰 위치 저장
         Think();
-        AreaOutCoolDown = AreaOutCount;
-        HomecomingCheckCoolDown = HomecomingCheckCount;
-        BoxForRay = new Vector2(GetComponent<BoxCollider2D>().size.x, GetComponent<BoxCollider2D>().size.y);
+        _areaOutCoolDown = _areaOutCount;
+        _homecomingCheckCoolDown = _homecomingCheckCount;
+        _boxForRay = new Vector2(GetComponent<BoxCollider2D>().size.x, GetComponent<BoxCollider2D>().size.y);
     }
 
     void Update()
     {
         PlayerScanning();
 
-        if (isPlayerDetected == true)
+        if (_isPlayerDetected == true)
         {
-            TargetPosition = PlayerTransform.position;
+            TargetPosition = _playerTransform.position;
         }
-        else if (isPlayerDetected == false)
+        else if (_isPlayerDetected == false)
         {
             Think();
         }
@@ -74,81 +77,93 @@ public class MonobehaviourAnimalAction : MonoBehaviour/*, IAttackable*/
 
         nextMoveSetting();
 
+        Attacking();
+
         Moving();
 
-        Debug.DrawRay(transform.position, (targetPosition - (Vector2)transform.position).normalized, Color.red);
-        Debug.DrawRay(targetPosition, Vector2.up, Color.blue);
-        
+        AttackTry();
+
+        Debug.DrawRay(transform.position, (_targetPosition - (Vector2)transform.position).normalized, Color.red);
+        Debug.DrawRay(_targetPosition, Vector2.up, Color.blue);
+
     }
     void nextMoveSetting()
     {
         //RaycastHit2D hit = Physics2D.BoxCast(transform.position, BoxForRay, 0, (targetPosition - transform.position), Vector2.Distance(targetPosition, transform.position), ObstacleLayer);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (targetPosition - (Vector2)transform.position), Vector2.Distance(targetPosition, transform.position), ObstacleLayer);
-        
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (_targetPosition - (Vector2)transform.position), Vector2.Distance(_targetPosition, transform.position), _obstacleLayer);
+
 
         if (hit.collider == null)
         {
-            nextMovePosition = targetPosition;
+            _nextMovePosition = _targetPosition;
             return;
         }
         else if (hit.collider != null)
         {
             //nextMovePosition = Vector2.Dot(hit.normal, (hit.point - (Vector2)transform.position)) * hit.normal;
-            nextMovePosition = Vector2.Reflect((hit.point - (Vector2)transform.position), hit.normal).normalized + hit.point;
+            _nextMovePosition = Vector2.Reflect((hit.point - (Vector2)transform.position), hit.normal).normalized + hit.point;
         }
-        Debug.DrawRay(hit.point , nextMovePosition - hit.point, Color.blue);
+        Debug.DrawRay(hit.point, _nextMovePosition - hit.point, Color.blue);
     }
 
     void PlayerScanning()
     {
-        RaycastHit2D hit = Physics2D.CircleCast(transform.position, detectRange, Vector2.zero, 0f, playerLayer);
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, _detectRange, Vector2.zero, 0f, _playerLayer);
 
         if (hit.collider == null)
         {
-            isPlayerDetected = false;
-            targetPosition = lastDetect == true ? transform.position : TargetPosition;
-            lastDetect = false;
+            _isPlayerDetected = false;
+            _targetPosition = _lastDetect == true ? transform.position : TargetPosition;
+            _lastDetect = false;
         }
         else
         {
             Debug.Log(hit.collider.name);
-            isPlayerDetected = true;
-            PlayerTransform = hit.transform;
-            lastDetect = true;
+            _isPlayerDetected = true;
+            _playerTransform = hit.transform;
+            _lastDetect = true;
         }
     }
 
     void Think()
     {
-        if (ThinkLock == false)
+        if (_thinkLock == false)
         {
-            ThinkTime -= Time.deltaTime;
-            anime.SetTrigger("Thinking");
+            _thinkTime -= Time.deltaTime;
+            _anime.SetTrigger("Thinking");
         }
 
-        if (ThinkTime <= 0)
+        if (_thinkTime <= 0)
         {
-            anime.SetTrigger("ThinkEnd");
-            ThinkTime = Random.Range(1f, 2f);
-            hVectorThink = Random.Range(-10f, 10f);
-            vVectorThink = Random.Range(-10f, 10f);
-            TargetPosition = new Vector2(hVectorThink, vVectorThink) + spawnPosition;
+            _anime.SetTrigger("ThinkEnd");
+            _thinkTime = Random.Range(1f, 2f);
+            _hVectorThink = Random.Range(-10f, 10f);
+            _vVectorThink = Random.Range(-10f, 10f);
+            TargetPosition = new Vector2(_hVectorThink, _vVectorThink) + _spawnPosition;
 
         }
 
         //RaycastHit2D hit = Physics2D.BoxCast(transform.position, BoxForRay, 0, targetPosition - transform.position , Vector2.Distance(targetPosition, transform.position), ObstacleLayer);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (targetPosition - (Vector2)transform.position), Vector2.Distance(targetPosition, transform.position), ObstacleLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (_targetPosition - (Vector2)transform.position), Vector2.Distance(_targetPosition, transform.position), _obstacleLayer);
 
         if (hit.collider != null)
         {
             TargetPosition = ((Vector2)transform.position - hit.point) - hit.point;
         }
     }
+
+    void Attacking()
+    {
+        if (!_isAttack) { return; }
+        _nextMovePosition = transform.position;
+    }
+
     void Moving()
     {
-        if (Vector2.Distance(transform.position, nextMovePosition) >= 0.01f && isPlayerDetected == false)
+        if (_isAttacked) { return; }
+        if (Vector2.Distance(transform.position, _nextMovePosition) >= 0.01f)
         {
-            Vector3 direction = (nextMovePosition - (Vector2)transform.position).normalized;
+            Vector3 direction = (_nextMovePosition - (Vector2)transform.position).normalized;
             if (direction.x < 0)
             {
                 GetComponent<SpriteRenderer>().flipX = true;
@@ -158,54 +173,101 @@ public class MonobehaviourAnimalAction : MonoBehaviour/*, IAttackable*/
                 GetComponent<SpriteRenderer>().flipX = false;
             }
 
-            transform.position += direction * Speed * Time.deltaTime;
+            transform.position += direction * _speed * Time.deltaTime;
             //Vector2.MoveTowards(transform.position, nextMovePosition, Speed * Time.deltaTime);
-            anime.SetBool("isRunning", true);
-            ThinkLock = true;
+            _anime.SetBool("isRunning", true);
+            _thinkLock = true;
         }
-        else if (Vector2.Distance(transform.position, targetPosition) <= 1.4f && isPlayerDetected == true)
-        {
-            anime.SetTrigger("Attacking");
+        //else if (Vector2.Distance(transform.position, targetPosition) <= 1.4f && isPlayerDetected == true)
+        //{
+        //    anime.SetTrigger("Attacking");
 
-        }
+        //}
         else
         {
-            anime.SetBool("isRunning", false);
-            ThinkLock = false;
-            HomecomingLock = false;
-            
+            _anime.SetBool("isRunning", false);
+            _thinkLock = false;
+            _homecomingLock = false;
+
         }
     }
     void HomeComing()
     {
-        if (isPlayerDetected == true)
+        if (_isPlayerDetected == true)
         {
             return;
         }
-        HomecomingCheckCoolDown -= Time.deltaTime;
-        if (HomecomingCheckCoolDown <= 0)
+        _homecomingCheckCoolDown -= Time.deltaTime;
+        if (_homecomingCheckCoolDown <= 0)
         {
-            hits = null;
-            hits = Physics2D.BoxCastAll(spawnPosition, AreaSize, 0f, Vector3.zero, 0, LayerMask.GetMask("Animal"));
-            HomecomingCheckCoolDown = HomecomingCheckCount;
+            _hitArr = null;
+            _hitArr = Physics2D.BoxCastAll(_spawnPosition, _areaSize, 0f, Vector3.zero, 0, LayerMask.GetMask("Animal"));
+            _homecomingCheckCoolDown = _homecomingCheckCount;
         }
-        if (hits.Length != 0)
+        if (_hitArr.Length != 0)
         {
-            for (int i = 0; i < hits.Length; i++)
+            for (int i = 0; i < _hitArr.Length; i++)
             {
-                if (hits[i].collider.gameObject.Equals(gameObject))
+                if (_hitArr[i].collider.gameObject.Equals(gameObject))
                 {
                     return;
                 }
             }
         }
-        AreaOutCoolDown -= Time.deltaTime;
-        if (AreaOutCoolDown <= 0)
+        _areaOutCoolDown -= Time.deltaTime;
+        if (_areaOutCoolDown <= 0)
         {
-            TargetPosition = spawnPosition;
-            AreaOutCoolDown = AreaOutCount;
-            HomecomingLock = true;
+            TargetPosition = _spawnPosition;
+            _areaOutCoolDown = _areaOutCount;
+            _homecomingLock = true;
         }
     }
 
+    void AttackTry()
+    {
+        if (_isAttack) { return; }
+        if (Vector2.Distance(transform.position, _targetPosition) <= 1.4f && _isPlayerDetected == true)
+        {
+            StartCoroutine(AsyncAttack());
+        }
+
+        IEnumerator AsyncAttack()
+        {
+            _anime.SetTrigger("Attacking");
+            _isAttack = true;
+            yield return new WaitForSeconds(0.8f);
+            RaycastHit2D hit = Physics2D.BoxCast(transform.position, _boxForRay, 0,
+                _targetPosition - (Vector2)transform.position, 1.5f, _playerLayer);
+            if(hit.collider != null)
+            {
+                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, _knockBackPower);
+            }
+            yield return new WaitForSeconds(0.2f);
+            _isAttack = false;
+        }
+    }
+
+    public void Attacked(Vector2 attacker, float knockBackPower)
+    {
+        StartCoroutine(AsyncAttacked(attacker, knockBackPower));
+    }
+
+    IEnumerator AsyncAttacked(Vector2 attacker, float knockBackPower)
+    {
+        _isAttacked = true;
+        float knockTime = 0.4f;
+        float knockCoolDown = 0;
+        Vector2 startPos = transform.position;
+        Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
+
+        while (knockCoolDown < knockTime)
+        {
+            knockCoolDown += Time.deltaTime;
+            transform.position = Vector2.Lerp(startPos, endPos, knockCoolDown / knockTime);
+            yield return null;
+        }
+        transform.position = endPos;
+
+        _isAttacked = false;
+    }
 }
