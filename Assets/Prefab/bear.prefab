@@ -168,7 +168,7 @@ MonoBehaviour:
   _wanderingMinX: -8
   _wanderingMaxX: 8
   _wanderingMinY: -8
-  _wanderingMaxY: -8
+  _wanderingMaxY: 8
   _areaOutCount: 2
   _areaSize: {x: 15, y: 15}
   _boxForRay: {x: 0, y: 0}
@@ -177,6 +177,8 @@ MonoBehaviour:
   _knockBackPower: 5
   _atk: 20
   _def: 5
+  lossSpeed: 30
+  _animalSlider: {fileID: 3679974860544298332}
 --- !u!212 &1964427254573441856
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -242,7 +244,7 @@ Animator:
   m_GameObject: {fileID: 4676141857588249436}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c23397a54b62c1b43865cd1ddbcef6a0, type: 2}
+  m_Controller: {fileID: 9100000, guid: d06818bb6efa41149a3e7a39f5989c75, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -450,6 +452,7 @@ GameObject:
   - component: {fileID: 6254552942513478711}
   - component: {fileID: 701356328598495054}
   - component: {fileID: 6412196048034291481}
+  - component: {fileID: 3908573430530681417}
   m_Layer: 13
   m_Name: Animal Canvas
   m_TagString: Untagged
@@ -540,6 +543,28 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!95 &3908573430530681417
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5227340273615448831}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ac6d201c4466d8542a05bd257c87a978, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5928050936554514203
 GameObject:
   m_ObjectHideFlags: 0

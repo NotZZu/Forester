@@ -64,7 +64,14 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     [SerializeField] float _atk;
     [SerializeField] float _def;
     Coroutine _hpBarCoroutine;
+    float _realHp;
+    float _resultHp;
+    [SerializeField] float lossSpeed;
+    [SerializeField] Slider _animalSlider;
     #endregion
+
+    [SerializeField] float _hungerTick;
+    [SerializeField] float _thirstTick;
 
     void Awake()
     {
@@ -78,7 +85,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         _boxForRay = new Vector2(GetComponent<BoxCollider2D>().size.x, GetComponent<BoxCollider2D>().size.y);
         _hpBar = GetComponentInChildren<Slider>();
         _hpBar.gameObject.SetActive(false);
-        _hpBar.value = _hpBar.maxValue;
+        _realHp = _hpBar.maxValue;
+        _resultHp = _hpBar.maxValue;
     }
 
     void Update()
@@ -99,6 +107,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
         Attacking();
 
+        GradualHpLoss();
+
         Moving();
 
         AttackTry();
@@ -106,6 +116,15 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         Debug.DrawRay(transform.position, (_targetPosition - (Vector2)transform.position).normalized, Color.red);
         Debug.DrawRay(_targetPosition, Vector2.up, Color.blue);
 
+    }
+    void GradualHpLoss()
+    {
+        if (_resultHp != _realHp)
+        {
+            _resultHp = Mathf.MoveTowards(_resultHp, _realHp, lossSpeed * Time.deltaTime);
+            if (Mathf.Abs(_realHp - _resultHp) <= 0.001) { _resultHp = _realHp; }
+            _hpBar.value = _resultHp;
+        }
     }
     void nextMoveSetting()
     {
@@ -179,7 +198,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     void Moving()
     {
         if (_isAttacked) { return; }
-        if (Vector2.Distance(transform.position, _nextMovePosition) >= 0.01f)
+        if (Vector2.Distance(transform.position, _nextMovePosition) >= 0.07f)
         {
             Vector3 direction = (_nextMovePosition - (Vector2)transform.position).normalized;
             if (direction.x < 0)
@@ -276,7 +295,12 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         float knockTime = 0.4f;
         float knockCoolDown = 0;
 
-        _hpBar.value -= (damage - _def);
+        _realHp -= (damage - _def);
+        if (Mathf.Round(_realHp / _hpBar.maxValue * 100) >= 20)
+        {
+            //_animalSlider.GetComponent<Animator>().SetTrigger("Auch!");
+        }
+
         if (_hpBarCoroutine != null) { StopCoroutine(_hpBarCoroutine); }
         _hpBarCoroutine = StartCoroutine(HpBarShow());
 

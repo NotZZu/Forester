@@ -141,6 +141,7 @@ MonoBehaviour:
   _knockBackPower: 3
   _atk: 15
   _def: 3
+  lossSpeed: 30
 --- !u!212 &2254546770341574437
 SpriteRenderer:
   m_ObjectHideFlags: 0

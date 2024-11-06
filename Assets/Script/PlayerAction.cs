@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -63,6 +65,11 @@ public class PlayerAction : MonoBehaviour, IAttackable
     //[SerializeField] float 
     [SerializeField] float _atk;
     [SerializeField] float _def;
+    float _realHp;
+    float _resultHp;
+    [SerializeField] float lossSpeed;
+    [SerializeField] float _hungerTick;
+    [SerializeField] float _thirstTick;
     #endregion
 
     void Awake()
@@ -71,13 +78,16 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _rigid.interpolation = RigidbodyInterpolation2D.Interpolate;
         _anime = GetComponent<Animator>();
         _mCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
-        _hpBar.value = _hpBar.maxValue;
         _hungerBar.value = _hungerBar.maxValue;
         _thirstBar.value = _thirstBar.maxValue;
+        _realHp = _hpBar.maxValue;
+        _resultHp = _hpBar.maxValue;
     }
 
     void Update()
     {
+        living();
+
         Move();
 
 
@@ -121,14 +131,33 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             _craftScroll.ToggleScroll();
         }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+        }
 
         //Vector3 ve = new Vector3(h, v);
         //rigid.linearVelocity = new Vector2(h, v) * Speed;
         //transform.position = ve.normalized * Speed * Time.deltaTime + transform.position;
 
         Attack();
+        GradualHpLoss();
     }
-
+    void living()
+    {
+        _hungerBar.value -= _hungerTick * Time.deltaTime;
+        _thirstBar.value -= _thirstTick * Time.deltaTime;
+    }
+    void GradualHpLoss()
+    {
+        
+        if (_resultHp != _realHp)
+        {
+            _resultHp = Mathf.MoveTowards(_resultHp, _realHp, lossSpeed * Time.deltaTime);
+            if (Mathf.Abs(_realHp - _resultHp) <= 0.001) { _resultHp = _realHp; }
+            _hpBar.value = _resultHp;
+        }
+    }
     void Move()
     {
         //if (_isAttacked) { return; }
@@ -348,7 +377,15 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _isAttacked = true;
         float knockTime = 0.4f;
         float knockCoolDown = 0;
-        _hpBar.value -= (damage - _def);
+
+        if (Mathf.Round((damage - _def) / _realHp * 100) >= 20)
+        {
+            float asdf = Mathf.Round((damage - _def) / _realHp * 100);
+            _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+        }
+        _realHp -= (damage - _def);
+        
+
         Vector2 startPos = transform.position;
         Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
 
