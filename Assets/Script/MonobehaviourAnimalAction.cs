@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 {
@@ -8,11 +9,15 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     bool _isPlayerDetected = false;
     Transform _playerTransform;
     [SerializeField] float _speed;
-    Animator _anime;
+    [SerializeField] Animator _anime;
     Vector2 _spawnPosition;
-    [SerializeField] float _knockBackPower;
+    
     bool _isAttack;
 
+    [SerializeField] float _wanderingMinX;
+    [SerializeField] float _wanderingMaxX;
+    [SerializeField] float _wanderingMinY;
+    [SerializeField] float _wanderingMaxY;
 
     bool _lastDetect = false;
     float _hVectorThink;
@@ -48,7 +53,19 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     bool _isAttacked;
 
+    [SerializeField] float _attackTime; 
+    [SerializeField] float _attackDelay;
+
     RaycastHit2D[] _hitArr = { };
+
+    #region hp및 데미지 관련 필드
+    [SerializeField] float _knockBackPower;
+    Slider _hpBar;
+    [SerializeField] float _atk;
+    [SerializeField] float _def;
+    Coroutine _hpBarCoroutine;
+    #endregion
+
     void Awake()
     {
         _playerLayer = LayerMask.GetMask("Player");
@@ -59,6 +76,9 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         _areaOutCoolDown = _areaOutCount;
         _homecomingCheckCoolDown = _homecomingCheckCount;
         _boxForRay = new Vector2(GetComponent<BoxCollider2D>().size.x, GetComponent<BoxCollider2D>().size.y);
+        _hpBar = GetComponentInChildren<Slider>();
+        _hpBar.gameObject.SetActive(false);
+        _hpBar.value = _hpBar.maxValue;
     }
 
     void Update()
@@ -130,15 +150,13 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         if (_thinkLock == false)
         {
             _thinkTime -= Time.deltaTime;
-            _anime.SetTrigger("Thinking");
         }
 
         if (_thinkTime <= 0)
         {
-            _anime.SetTrigger("ThinkEnd");
             _thinkTime = Random.Range(1f, 2f);
-            _hVectorThink = Random.Range(-10f, 10f);
-            _vVectorThink = Random.Range(-10f, 10f);
+            _hVectorThink = Random.Range(_wanderingMinX, _wanderingMaxX);
+            _vVectorThink = Random.Range(_wanderingMinY, _wanderingMaxY);
             TargetPosition = new Vector2(_hVectorThink, _vVectorThink) + _spawnPosition;
 
         }
@@ -235,28 +253,33 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         {
             _anime.SetTrigger("Attacking");
             _isAttack = true;
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(_attackDelay);
             RaycastHit2D hit = Physics2D.BoxCast(transform.position, _boxForRay, 0,
                 _targetPosition - (Vector2)transform.position, 1.5f, _playerLayer);
             if(hit.collider != null)
             {
-                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, _knockBackPower);
+                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, _knockBackPower, _atk);
             }
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(_attackTime - _attackDelay);
             _isAttack = false;
         }
     }
 
-    public void Attacked(Vector2 attacker, float knockBackPower)
+    public void Attacked(Vector2 attacker, float knockBackPower, float damage)
     {
-        StartCoroutine(AsyncAttacked(attacker, knockBackPower));
+        StartCoroutine(AsyncAttacked(attacker, knockBackPower, damage));
     }
 
-    IEnumerator AsyncAttacked(Vector2 attacker, float knockBackPower)
+    IEnumerator AsyncAttacked(Vector2 attacker, float knockBackPower, float damage)
     {
         _isAttacked = true;
         float knockTime = 0.4f;
         float knockCoolDown = 0;
+
+        _hpBar.value -= (damage - _def);
+        if (_hpBarCoroutine != null) { StopCoroutine(_hpBarCoroutine); }
+        _hpBarCoroutine = StartCoroutine(HpBarShow());
+
         Vector2 startPos = transform.position;
         Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
 
@@ -269,5 +292,11 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         transform.position = endPos;
 
         _isAttacked = false;
+    }
+    IEnumerator HpBarShow()
+    {
+        _hpBar.gameObject.SetActive(true);
+        yield return new WaitForSeconds(3); // 대기상태로 진입하고 3초 이후 준비 상태로 진입
+        _hpBar.gameObject.SetActive(false);
     }
 }

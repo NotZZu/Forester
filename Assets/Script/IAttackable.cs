@@ -2,5 +2,5 @@ using UnityEngine;
 
 public interface IAttackable
 {
-    void Attacked(Vector2 attacker, float knockBackPower);
+    void Attacked(Vector2 attacker, float knockBackPower, float damage);
 }

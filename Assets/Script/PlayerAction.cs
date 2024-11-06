@@ -49,10 +49,20 @@ public class PlayerAction : MonoBehaviour, IAttackable
     Vector2 checkVector;
 
     #region 스킬 관련 필드
+    [SerializeField] GameObject _skill;
     float _skill0CoolTime = 3;
     float _skill0CoolDown;
     [SerializeField] GameObject _skill0;
     Vector2 _lastMoveDirection;
+    #endregion
+
+    #region status 관련 필드
+    [SerializeField] Slider _hpBar;
+    [SerializeField] Slider _hungerBar;
+    [SerializeField] Slider _thirstBar;
+    //[SerializeField] float 
+    [SerializeField] float _atk;
+    [SerializeField] float _def;
     #endregion
 
     void Awake()
@@ -61,6 +71,9 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _rigid.interpolation = RigidbodyInterpolation2D.Interpolate;
         _anime = GetComponent<Animator>();
         _mCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+        _hpBar.value = _hpBar.maxValue;
+        _hungerBar.value = _hungerBar.maxValue;
+        _thirstBar.value = _thirstBar.maxValue;
     }
 
     void Update()
@@ -306,13 +319,13 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             float _skillShotAngle = Mathf.Rad2Deg * Mathf.Acos(Vector2.Dot(Vector2.up, (_dirVec).normalized));
             if (_dirVec.x > 0) { _skillShotAngle = 360 - _skillShotAngle; }
-            _bag.transform.rotation = Quaternion.Euler(0f, 0f, _skillShotAngle);
+            _skill.transform.rotation = Quaternion.Euler(0f, 0f, _skillShotAngle);
             _skill0.SetActive(true);
-            RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(1.1f, 0.6f), _bag.transform.rotation.z,
+            RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(1.1f, 0.6f), _skill.transform.rotation.z,
                 _dirVec, 0.6f, LayerMask.GetMask("Animal"));
             if (hit.collider != null)
             {
-                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, 1.5f);
+                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, 1.5f, _atk);
             }
             _isStun = true;
             yield return new WaitForSeconds(0.417f);
@@ -325,16 +338,17 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
 
     //////////////////////////외부 접근 메소드/////////////////////////////
-    public void Attacked(Vector2 attacker, float knockBackPower)
+    public void Attacked(Vector2 attacker, float knockBackPower, float damage)
     {
-        StartCoroutine(AsyncAttacked(attacker, knockBackPower));
+        StartCoroutine(AsyncAttacked(attacker, knockBackPower, damage));
     }
 
-    IEnumerator AsyncAttacked(Vector2 attacker, float knockBackPower)
+    IEnumerator AsyncAttacked(Vector2 attacker, float knockBackPower, float damage)
     {
         _isAttacked = true;
         float knockTime = 0.4f;
         float knockCoolDown = 0;
+        _hpBar.value -= (damage - _def);
         Vector2 startPos = transform.position;
         Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
 

@@ -5,7 +5,7 @@ using System;
 public class ObjectPool : MonoBehaviour
 {
     [SerializeField] GameObject itemPrefab;
-    [SerializeField] Sprite[] itemSprites;
+    [SerializeField] List<Sprite> itemSprites;
 
     internal Dictionary<string, List<GameObject>> itemPools = new Dictionary<string, List<GameObject>>();
     List<GameObject> TargetPool = new();

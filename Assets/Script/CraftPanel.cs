@@ -153,6 +153,14 @@ public class CraftPanel : MonoBehaviour
             subMaterial = null;
         }
 
+        if (isMainMaterialSlotSelected || isSubMaterialSlotSelected)
+        {
+            isMainMaterialSlotSelected = false;
+            isSubMaterialSlotSelected = false;
+            mainMaterialSlot.GetComponent<Image>().color = Color.white;
+            subMaterialSlot.GetComponent<Image>().color = Color.white;
+        }
+
         craftPanel.SetActive(false);
     }
 }
