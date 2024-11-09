@@ -21,6 +21,7 @@ internal class itemGrp
 }
 public class PlayerAction : MonoBehaviour, IAttackable
 {
+    [SerializeField] LayerMask _combinedMask;
     public float _speed;
     float _h, _v;
     Rigidbody2D _rigid;
@@ -38,7 +39,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
     internal List<itemGrp> _bagList = new();
     [SerializeField] GameObject _bag;
 
-    [SerializeField] Item _ItemManager;
+    [SerializeField] MonobehaviourItem _ItemManager;
     [SerializeField] CraftScroll _craftScroll;
 
     [SerializeField] GameObject _realBag;
@@ -110,8 +111,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
         Debug.DrawRay(transform.position, _dirVec * 1.2f, new Color(0, 0, 0));
 
 
-        LayerMask combinedMask = LayerMask.GetMask("Tree", "Water", "Soil", "Branch", "Stone"); //(1 << 4) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, _dirVec, 1.2f, combinedMask);
+        //combinedMask = LayerMask.GetMask("Tree", "Water", "Soil", "Branch", "Stone"); //(1 << 4) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, _dirVec, 1.2f, _combinedMask);
 
         if (hit.collider != null)
         {
@@ -125,7 +126,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
         if (Input.GetKeyDown(KeyCode.E) && _scanObject != null)
         {
             //scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, scanObject);
-            _ItemManager.DropObject(transform.position, hit.point, _scanObject);
+            _scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, _scanObject);
+            //_ItemManager.DropObject(transform.position, hit.point, _scanObject);
             //manager.Collect(scanObject);
         }
 

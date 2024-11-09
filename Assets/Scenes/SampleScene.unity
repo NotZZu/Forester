@@ -2138,6 +2138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objPool: {fileID: 2002231652}
   Speed: 20
+  _dropItemList: 
 --- !u!1 &102538405
 GameObject:
   m_ObjectHideFlags: 0
@@ -3558,7 +3559,7 @@ MonoBehaviour:
   _collectText: {fileID: 1888860131}
   _manager: {fileID: 61534612}
   _bag: {fileID: 679953775}
-  _ItemManager: {fileID: 2037114644}
+  _ItemManager: {fileID: 0}
   _craftScroll: {fileID: 357519352}
   _realBag: {fileID: 679953775}
   _skill: {fileID: 1365531514}
@@ -3571,8 +3572,8 @@ MonoBehaviour:
   _atk: 10
   _def: 5
   lossSpeed: 30
-  _hungerTick: 0
-  _thirstTick: 0
+  _hungerTick: 0.3
+  _thirstTick: 0.3
   _portrait: {fileID: 1608573477}
   _smoothCamera: {x: 0.1, y: 0.1, z: 0}
 --- !u!1 &477772035
@@ -4075,7 +4076,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 595602338}
-  - component: {fileID: 595602344}
+  - component: {fileID: 595602347}
   - component: {fileID: 595602340}
   - component: {fileID: 595602339}
   - component: {fileID: 595602342}
@@ -4505,20 +4506,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &595602344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 595602337}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab0deec096660524d8a28aa30b597ad2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objPool: {fileID: 2002231652}
-  Speed: 0
 --- !u!114 &595602345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4549,6 +4536,21 @@ MonoBehaviour:
   m_Area: 1
   m_IgnoreFromBuild: 0
   m_AffectedAgents: ffffffff
+--- !u!114 &595602347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595602337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab0deec096660524d8a28aa30b597ad2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objPool: {fileID: 0}
+  Speed: 20
+  _dropItemList: 
 --- !u!1 &611018637
 GameObject:
   m_ObjectHideFlags: 0
@@ -7406,6 +7408,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tree
       objectReference: {fileID: 0}
+    - target: {fileID: 4303636420508076259, guid: 748b822ae3db63e42a23edd1dae8ef69, type: 3}
+      propertyPath: objPool
+      value: 
+      objectReference: {fileID: 2002231652}
     - target: {fileID: 6313324891538303549, guid: 748b822ae3db63e42a23edd1dae8ef69, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.6266267
@@ -26293,7 +26299,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2037114643
 Transform:
   m_ObjectHideFlags: 0
@@ -26316,13 +26322,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2037114642}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b591c17f8d866346a3ea73b76359ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objPool: {fileID: 2002231652}
   Speed: 20
+  _dropItemList: 
 --- !u!1 &2072007518
 GameObject:
   m_ObjectHideFlags: 0
@@ -26601,6 +26608,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bear
       objectReference: {fileID: 0}
+    - target: {fileID: 4676141857588249436, guid: 5776741dd11698c428b2c1eb3f949cf0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4757813902642455926, guid: 5776741dd11698c428b2c1eb3f949cf0, type: 3}
       propertyPath: _atk
       value: 20
@@ -26627,11 +26638,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5152936265651311518, guid: 5776741dd11698c428b2c1eb3f949cf0, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5152936265651311518, guid: 5776741dd11698c428b2c1eb3f949cf0, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5891368990824817716, guid: 5776741dd11698c428b2c1eb3f949cf0, type: 3}
       propertyPath: m_PixelsPerUnitMultiplier

@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +24,6 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     float _hVectorThink;
     float _vVectorThink;
     float _thinkTime;
-    bool _isThinking = false;
     Vector2 _targetPosition;
     Vector2 _nextMovePosition;
     Vector3 TargetPosition
@@ -70,6 +70,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     float _resultHp;
     [SerializeField] float lossSpeed;
     [SerializeField] Slider _animalSlider;
+    bool _isDead = false;
     #endregion
 
 
@@ -92,6 +93,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     void Update()
     {
+        if (_isDead == true) { return; }
         PlayerScanning();
 
         if (_isPlayerDetected == true)
@@ -129,6 +131,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
             if (_hpBar.value == _hpBar.minValue)
             {
                 _anime.SetTrigger("Dead");
+                _isDead = true;
+
             }
         }
     }

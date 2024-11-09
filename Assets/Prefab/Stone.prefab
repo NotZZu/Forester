@@ -9,10 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 343645724107635358}
+  - component: {fileID: 3931510733406095485}
   - component: {fileID: 1080930783772715087}
   - component: {fileID: 258940408628161160}
   - component: {fileID: 913914882531196340}
-  m_Layer: 10
+  m_Layer: 15
   m_Name: Stone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,6 +35,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3931510733406095485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4589822674188531016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddd3ed75bdd53494dbce45aa3cef1d4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objPool: {fileID: 0}
+  Speed: 20
+  _dropItemList: 03000000
 --- !u!212 &1080930783772715087
 SpriteRenderer:
   m_ObjectHideFlags: 0
