@@ -176,6 +176,8 @@ MonoBehaviour:
   _attackDelay: 0.8
   _knockBackPower: 5
   _atk: 20
+  _atkCoolTime: 2
+  _atkCoolDown: 0
   _def: 5
   lossSpeed: 30
   _animalSlider: {fileID: 3679974860544298332}

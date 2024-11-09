@@ -52,10 +52,12 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
     #region 스킬 관련 필드
     [SerializeField] GameObject _skill;
-    float _skill0CoolTime = 3;
+    [SerializeField] float _skill0CoolTime = 3;
     float _skill0CoolDown;
     [SerializeField] GameObject _skill0;
     Vector2 _lastMoveDirection;
+    [SerializeField] Slider _playerAtkCollDownBar;
+    Coroutine coolDownCoroutine;
     #endregion
 
     #region status 관련 필드
@@ -70,6 +72,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
     [SerializeField] float lossSpeed;
     [SerializeField] float _hungerTick;
     [SerializeField] float _thirstTick;
+    [SerializeField] Image _portrait; 
     #endregion
 
     void Awake()
@@ -82,6 +85,9 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _thirstBar.value = _thirstBar.maxValue;
         _realHp = _hpBar.maxValue;
         _resultHp = _hpBar.maxValue;
+        _playerAtkCollDownBar.maxValue = _skill0CoolTime;
+        _playerAtkCollDownBar.gameObject.SetActive(false);
+        //StartCoroutine(CheckPlayerHp());
     }
 
     void Update()
@@ -134,6 +140,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
         if (Input.GetKeyDown(KeyCode.G))
         {
             _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+            _portrait.GetComponent<Animator>().SetTrigger("Auch!");
         }
 
         //Vector3 ve = new Vector3(h, v);
@@ -143,6 +150,14 @@ public class PlayerAction : MonoBehaviour, IAttackable
         Attack();
         GradualHpLoss();
     }
+    //IEnumerator CheckPlayerHp()
+    //{
+    //    if (_hpBar.value / _hpBar.maxValue < 0.3f)
+    //    {
+    //        _portrait.GetComponent<Animator>().SetTrigger("Auch!");
+    //    }
+    //    yield return null;
+    //}
     void living()
     {
         _hungerBar.value -= _hungerTick * Time.deltaTime;
@@ -338,9 +353,12 @@ public class PlayerAction : MonoBehaviour, IAttackable
     void Attack()
     {
         _skill0CoolDown += Time.deltaTime;
+        _playerAtkCollDownBar.value = _skill0CoolDown;
         if (Input.GetKeyDown(KeyCode.Space) && _skill0CoolDown > _skill0CoolTime)
         {
             StartCoroutine(AsyncAttack());
+            if (coolDownCoroutine != null) { StopCoroutine(coolDownCoroutine); }
+            coolDownCoroutine = StartCoroutine(ShowAtkCoolDown());
             _skill0CoolDown = 0;
         }
 
@@ -363,6 +381,13 @@ public class PlayerAction : MonoBehaviour, IAttackable
             _isStun = false;
         }
 
+        IEnumerator ShowAtkCoolDown()
+        {
+            _playerAtkCollDownBar.gameObject.SetActive(true);
+            yield return new WaitForSeconds(_skill0CoolTime + 0.3f);
+            _playerAtkCollDownBar.gameObject.SetActive(false);
+        }
+
     }
 
 
@@ -382,6 +407,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             float asdf = Mathf.Round((damage - _def) / _realHp * 100);
             _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+            _portrait.GetComponent<Animator>().SetTrigger("Auch!");
         }
         _realHp -= (damage - _def);
         

@@ -62,6 +62,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     [SerializeField] float _knockBackPower;
     Slider _hpBar;
     [SerializeField] float _atk;
+    [SerializeField] float _atkCoolTime;
+    [SerializeField] float _atkCoolDown;
     [SerializeField] float _def;
     Coroutine _hpBarCoroutine;
     float _realHp;
@@ -70,8 +72,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     [SerializeField] Slider _animalSlider;
     #endregion
 
-    [SerializeField] float _hungerTick;
-    [SerializeField] float _thirstTick;
+
 
     void Awake()
     {
@@ -117,6 +118,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         Debug.DrawRay(_targetPosition, Vector2.up, Color.blue);
 
     }
+
     void GradualHpLoss()
     {
         if (_resultHp != _realHp)
@@ -124,6 +126,10 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
             _resultHp = Mathf.MoveTowards(_resultHp, _realHp, lossSpeed * Time.deltaTime);
             if (Mathf.Abs(_realHp - _resultHp) <= 0.001) { _resultHp = _realHp; }
             _hpBar.value = _resultHp;
+            if (_hpBar.value == _hpBar.minValue)
+            {
+                _anime.SetTrigger("Dead");
+            }
         }
     }
     void nextMoveSetting()
@@ -262,10 +268,13 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     void AttackTry()
     {
+        _atkCoolDown += Time.deltaTime;
         if (_isAttack) { return; }
+        if (_atkCoolDown < _atkCoolTime) { return; }
         if (Vector2.Distance(transform.position, _targetPosition) <= 1.4f && _isPlayerDetected == true)
         {
             StartCoroutine(AsyncAttack());
+            _atkCoolDown = 0;
         }
 
         IEnumerator AsyncAttack()
