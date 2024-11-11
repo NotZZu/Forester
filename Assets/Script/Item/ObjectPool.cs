@@ -21,7 +21,11 @@ public class ObjectPool : MonoBehaviour
         Berry,
         Axe,
         Pickaxe,
-        Sword
+        Sword,
+        Meat,
+        Bone,
+        Leather,
+        Fish
     }
 
     void Awake()
@@ -41,6 +45,10 @@ public class ObjectPool : MonoBehaviour
         CreatePool(ItemType.Axe, 100, itemSprites[7], "µµ³¢");
         CreatePool(ItemType.Pickaxe, 100, itemSprites[8], "°î±ªÀÌ");
         CreatePool(ItemType.Sword, 100, itemSprites[9], "°Ë");
+        CreatePool(ItemType.Meat, 100, itemSprites[10], "°í±â", "½Ä¿ë");
+        CreatePool(ItemType.Bone, 100, itemSprites[11], "»À", "´Ü´ÜÇÔ", "¸·´ë");
+        CreatePool(ItemType.Leather, 100, itemSprites[12], "°¡Á×");
+        CreatePool(ItemType.Fish, 100, itemSprites[13], "¹°°í±â", "½Ä¿ë");
     }
 
     void CreatePool(ItemType itemType, int count, Sprite sprite, params string[] properties)

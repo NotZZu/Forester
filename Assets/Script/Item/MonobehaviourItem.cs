@@ -48,4 +48,14 @@ public class MonobehaviourItem : MonoBehaviour, IObject
     {
         return Random.Range(45, -45.0f);
     }
+    public void SetDropItem(params ObjectPool.ItemType[] items)
+    {
+        objPool = FindAnyObjectByType<ObjectPool>();
+        _dropItemList = new();
+        _dropItemList.AddRange(items);
+        //foreach (var i in items)
+        //{
+        //    _dropItemList.Add(i);
+        //}
+    }
 }

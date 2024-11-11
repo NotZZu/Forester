@@ -73,7 +73,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
     [SerializeField] float lossSpeed;
     [SerializeField] float _hungerTick;
     [SerializeField] float _thirstTick;
-    [SerializeField] Image _portrait; 
+    [SerializeField] Image _portrait;
+    [SerializeField] float _hungerByMove;
     #endregion
 
     void Awake()
@@ -94,6 +95,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
     void Update()
     {
         living();
+
+        warningLessValue();
 
         Move();
 
@@ -143,6 +146,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
             _portrait.GetComponent<Animator>().SetTrigger("Auch!");
+            Resources.Load<MonobehaviourItem>("Prefab/bear");
         }
 
         //Vector3 ve = new Vector3(h, v);
@@ -164,6 +168,21 @@ public class PlayerAction : MonoBehaviour, IAttackable
     {
         _hungerBar.value -= _hungerTick * Time.deltaTime;
         _thirstBar.value -= _thirstTick * Time.deltaTime;
+    }
+    void warningLessValue()
+    {
+        if (_hpBar.value <= _hpBar.maxValue * 0.3f)
+        {
+            _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+        }
+        if (_hungerBar.value <= _hungerBar.maxValue * 0.3f)
+        {
+            _hungerBar.GetComponent<Animator>().SetTrigger("Auch!");
+        }
+        if (_thirstBar.value <= _thirstBar.maxValue * 0.3f)
+        {
+            _thirstBar.GetComponent<Animator>().SetTrigger("Auch!");
+        }
     }
     void GradualHpLoss()
     {
@@ -362,6 +381,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
             if (coolDownCoroutine != null) { StopCoroutine(coolDownCoroutine); }
             coolDownCoroutine = StartCoroutine(ShowAtkCoolDown());
             _skill0CoolDown = 0;
+            _hungerBar.value -= _hungerByMove;
         }
 
         IEnumerator AsyncAttack()

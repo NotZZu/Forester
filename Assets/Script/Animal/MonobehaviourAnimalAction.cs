@@ -40,7 +40,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     bool _thinkLock;
     bool _homecomingLock;
 
-    int _obstacleLayer;
+    [SerializeField] LayerMask _obstacleLayer;
 
     [SerializeField] float _areaOutCount;
     float _areaOutCoolDown;
@@ -78,7 +78,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     void Awake()
     {
         _playerLayer = LayerMask.GetMask("Player");
-        _obstacleLayer = LayerMask.GetMask("Tree", "Water", "Stone");
+        _obstacleLayer = LayerMask.GetMask("Obstacle_Collectible");
         _anime = GetComponent<Animator>();
         _spawnPosition = transform.position; // 스폰 위치 저장
         Think();
@@ -128,11 +128,14 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
             _resultHp = Mathf.MoveTowards(_resultHp, _realHp, lossSpeed * Time.deltaTime);
             if (Mathf.Abs(_realHp - _resultHp) <= 0.001) { _resultHp = _realHp; }
             _hpBar.value = _resultHp;
-            if (_hpBar.value == _hpBar.minValue)
+            if (_hpBar.value <= _hpBar.minValue) // 몬스터가 플레이어의 공격을 당해 죽으면
             {
-                _anime.SetTrigger("Dead");
-                _isDead = true;
-
+                _anime.SetTrigger("Dead"); // 사망 애니메이션 출력
+                _isDead = true; // 사망했음을 알림
+                //gameObject.layer = LayerMask.GetMask("Obstacle_Collectible"); // 이후 통행불가-채집가능 레이어로 변경하여 아이템 채집 기능활성
+                gameObject.layer = LayerMask.NameToLayer("Obstacle_Collectible");
+                gameObject.AddComponent<DeadBodyItem>();
+                gameObject.GetComponent<DeadBodyItem>().SetDropItem(ObjectPool.ItemType.Meat, ObjectPool.ItemType.Bone, ObjectPool.ItemType.Leather);
             }
         }
     }
@@ -299,6 +302,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     public void Attacked(Vector2 attacker, float knockBackPower, float damage)
     {
+        if (_isDead == true) { return; }
         StartCoroutine(AsyncAttacked(attacker, knockBackPower, damage));
     }
 
