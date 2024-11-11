@@ -13,8 +13,13 @@ public class CraftScroll : MonoBehaviour
     bool toggleScroll = false;
     [SerializeField] GameObject scrollView;
 
-    void Awake()
+    void Start()
     {
+        if (itemButtonPrefab == null || content == null || combine == null || scrollView == null || craftPanel == null) 
+        {
+            return; 
+        }
+        itemList = new();
         StartCoroutine(InitializeAfterCombine());
 
     }
@@ -24,7 +29,6 @@ public class CraftScroll : MonoBehaviour
         {
             yield return null;
         }
-        itemList = new();
         foreach (var res in combine.combinationRules)
         {
             itemList.Add(res);
@@ -43,8 +47,8 @@ public class CraftScroll : MonoBehaviour
             button.GetComponentInChildren<Text>().fontSize = 25;
             button.GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>("Art/Panel White");
             button.GetComponent<Button>().onClick.AddListener(() => OnItemButtonClick(item));
+            yield return null;
         }
-        yield break;
     }
     void OnItemButtonClick(CombineInfo itemName)
     {

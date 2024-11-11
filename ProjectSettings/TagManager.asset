@@ -4,11 +4,8 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Tree
-  - Water
-  - Soil
-  - Stone
-  - Branch
+  - Ground
+  - Area
   layers:
   - Default
   - TransparentFX

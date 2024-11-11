@@ -170,7 +170,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         }
         else
         {
-            Debug.Log(hit.collider.name);
+            //Debug.Log(hit.collider.name);
             _isPlayerDetected = true;
             _playerTransform = hit.transform;
             _lastDetect = true;

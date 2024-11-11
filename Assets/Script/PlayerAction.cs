@@ -34,7 +34,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
     [SerializeField] Manager _manager;
     bool _hDown, _hUp;
     bool _vDown, _vUp;
-    Vector2 _dirVec;
+    public Vector2 _dirVec;
 
     internal List<itemGrp> _bagList = new();
     [SerializeField] GameObject _bag;
