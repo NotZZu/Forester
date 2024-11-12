@@ -1,11 +1,15 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 public class PrefabManager : MonoBehaviour
 {
-    [SerializeField] Vector2 GreenBelt;
+    
     void Start()
     {
-        
+        var asdf = Resources.LoadAll<GameObject>("Prefab/ToRead");
+        Debug.Log(asdf.Length);
+
     }
 
     void Update()

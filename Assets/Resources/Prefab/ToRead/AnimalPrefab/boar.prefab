@@ -89,7 +89,6 @@ GameObject:
   - component: {fileID: 4477896136303329774}
   - component: {fileID: 8142073739382352456}
   - component: {fileID: 8188215977630640103}
-  - component: {fileID: 8142627207551672719}
   m_Layer: 13
   m_Name: boar
   m_TagString: Untagged
@@ -133,6 +132,9 @@ MonoBehaviour:
   _wanderingMaxX: 10
   _wanderingMinY: -10
   _wanderingMaxY: 10
+  _obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   _areaOutCount: 10
   _areaSize: {x: 20, y: 20}
   _boxForRay: {x: 0, y: 0}
@@ -295,28 +297,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!195 &8142627207551672719
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1264296941988333662}
-  m_Enabled: 0
-  m_AgentTypeID: 0
-  m_Radius: 1
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 4
-  m_BaseOffset: 2
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1 &1462120362602015309
 GameObject:
   m_ObjectHideFlags: 0
