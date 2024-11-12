@@ -33,6 +33,6 @@ public class Reposition : MonoBehaviour
         {
             transform.Translate(Vector3.up * dirY * 80);
         }
-        PrefabManager.PlacePrefab();
+        PrefabManager.PlacePrefab(transform.position);
     }
 }
