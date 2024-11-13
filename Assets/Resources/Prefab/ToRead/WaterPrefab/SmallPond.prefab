@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7631372567430395864}
   m_Layer: 14
   m_Name: SmallPond
-  m_TagString: Untagged
+  m_TagString: tilemap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -52,6 +52,7 @@ MonoBehaviour:
   objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 020000000d000000
+  _objName: "\uBB3C\uAC00"
 --- !u!1839735485 &332275953888492798
 Tilemap:
   m_ObjectHideFlags: 0

@@ -50,6 +50,7 @@ MonoBehaviour:
   objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 03000000
+  _objName: "\uB3CC\uB9F9\uC774"
 --- !u!212 &1080930783772715087
 SpriteRenderer:
   m_ObjectHideFlags: 0

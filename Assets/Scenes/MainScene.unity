@@ -1042,7 +1042,7 @@ GameObject:
   - component: {fileID: 158110953}
   - component: {fileID: 158110952}
   - component: {fileID: 158110951}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grass (3)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -18410,6 +18410,7 @@ Transform:
   - {fileID: 679953776}
   - {fileID: 1365531515}
   - {fileID: 1671726740}
+  - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &458025372
@@ -18467,7 +18468,7 @@ GameObject:
   - component: {fileID: 458445513}
   - component: {fileID: 458445512}
   - component: {fileID: 458445511}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grass (2)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -35069,7 +35070,7 @@ Transform:
   m_LocalScale: {x: 14.25, y: 14.25, z: 14.25}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 458025371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &519420033
 MonoBehaviour:
@@ -35980,6 +35981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c5b5c60c9e1cf499671e8f8de5c767, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _grid: {fileID: 2016407682}
 --- !u!1 &949604049
 GameObject:
   m_ObjectHideFlags: 0
@@ -38744,7 +38746,7 @@ GameObject:
   - component: {fileID: 1564393579}
   - component: {fileID: 1564393578}
   - component: {fileID: 1564393577}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grass
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -55719,7 +55721,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1671726740}
   - component: {fileID: 1671726741}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Area
   m_TagString: Area
   m_Icon: {fileID: 0}
@@ -57591,6 +57593,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1c84373cf4be81c44b97ce70ed9d78e6, type: 3}
   - {fileID: 21300000, guid: b332903765c1c44f493980fdbdc13ba4, type: 3}
   - {fileID: 21300000, guid: 78040fcc3a5ca0646b20e131d68b3660, type: 3}
+  - {fileID: 21300000, guid: 2774e5bbe63be204988f1c5f7f2ae979, type: 3}
+  - {fileID: 21300000, guid: 26de841f6d53c6a4da359d956be2c4f4, type: 3}
+  - {fileID: 21300000, guid: b4872dcff3a17a240a530f8c43714669, type: 3}
+  - {fileID: 21300000, guid: a3f4461a49e22334fbdf22204209f51d, type: 3}
+  - {fileID: 21300000, guid: 88f0b9bb88f3eb8489dec8c0cac3d11c, type: 3}
+  - {fileID: 21300000, guid: 966263a09293ab040b421553cbab8bc0, type: 3}
 --- !u!4 &2002231653
 Transform:
   m_ObjectHideFlags: 0
@@ -57652,7 +57660,6 @@ Transform:
   - {fileID: 2139990512}
   - {fileID: 458445510}
   - {fileID: 158110950}
-  - {fileID: 3625668933140788960}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2027599259
@@ -57794,6 +57801,7 @@ MonoBehaviour:
   objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 
+  _objName: 
 --- !u!1 &2072007518
 GameObject:
   m_ObjectHideFlags: 0
@@ -57982,7 +57990,7 @@ GameObject:
   - component: {fileID: 2139990515}
   - component: {fileID: 2139990514}
   - component: {fileID: 2139990513}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grass (1)
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -74290,74 +74298,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88b3ca9d0f9c3614993c11037a18ddc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &3625668933140788959
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 2016407683}
-    m_Modifications:
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4805807413122648087, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-      propertyPath: m_Name
-      value: SmallSoil
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
---- !u!4 &3625668933140788960 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1947594238089820905, guid: 5862a50e7fef8874893c18530f3388aa, type: 3}
-  m_PrefabInstance: {fileID: 3625668933140788959}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 619394802}
-  - {fileID: 519420032}
   - {fileID: 2016407683}
   - {fileID: 458025371}
   - {fileID: 223449954}

@@ -164,6 +164,7 @@ MonoBehaviour:
   _playerLayer: 0
   _speed: 3.8
   _anime: {fileID: 0}
+  _isPredator: 1
   _wanderingMinX: -8
   _wanderingMaxX: 8
   _wanderingMinY: -8

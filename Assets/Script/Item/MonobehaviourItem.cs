@@ -7,6 +7,8 @@ public class MonobehaviourItem : MonoBehaviour, IObject
     [SerializeField] protected ObjectPool objPool;
     [SerializeField] float Speed = 20;
     [SerializeField] protected List<ObjectPool.ItemType> _dropItemList;
+    [SerializeField] string _objName;
+    internal string _ObjName { get { return _objName; } set { _objName = value; } }
 
     void Awake()
     {

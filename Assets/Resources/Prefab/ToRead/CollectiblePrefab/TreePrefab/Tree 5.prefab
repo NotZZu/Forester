@@ -258,6 +258,7 @@ MonoBehaviour:
   objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 000000000400000005000000
+  _objName: "\uB098\uBB34"
 --- !u!1 &8024260093156867486
 GameObject:
   m_ObjectHideFlags: 0

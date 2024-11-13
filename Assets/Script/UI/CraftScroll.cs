@@ -47,8 +47,9 @@ public class CraftScroll : MonoBehaviour
             button.GetComponentInChildren<Text>().fontSize = 25;
             button.GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>("Art/Panel White");
             button.GetComponent<Button>().onClick.AddListener(() => OnItemButtonClick(item));
-            yield return null;
+            
         }
+        yield return null;
     }
     void OnItemButtonClick(CombineInfo itemName)
     {

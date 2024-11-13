@@ -12,8 +12,8 @@ public class CraftPanel : MonoBehaviour
     [SerializeField] Text subMaterialPropertiesText;
     [SerializeField] Button craftButton;
     [SerializeField] Button exitButton;
-    [SerializeField] Transform mainMaterialSlot;
-    [SerializeField] Transform subMaterialSlot;
+    [SerializeField] internal Transform mainMaterialSlot;
+    [SerializeField] internal Transform subMaterialSlot;
     [SerializeField] Transform objMaterialSlot;
     [SerializeField] ItemCombine craft;
     [SerializeField] PlayerAction player;

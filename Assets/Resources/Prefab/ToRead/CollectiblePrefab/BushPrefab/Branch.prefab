@@ -150,3 +150,6 @@ MonoBehaviour:
   objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 040000000600000005000000
+  _objName: "\uC218\uD480"
+  _prefabWeightMax: 0
+  _prefabWeightMin: 10

@@ -12,6 +12,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     [SerializeField] float _speed;
     [SerializeField] Animator _anime;
     Vector2 _spawnPosition;
+    [SerializeField] bool _isPredator;
     
     bool _isAttack;
 
@@ -96,7 +97,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         if (_isDead == true) { return; }
         PlayerScanning();
 
-        if (_isPlayerDetected == true)
+        if (_isPlayerDetected == true && _isPredator)
         {
             TargetPosition = _playerTransform.position;
         }
@@ -116,10 +117,45 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
         AttackTry();
 
+        RunAway();
+
         Debug.DrawRay(transform.position, (_targetPosition - (Vector2)transform.position).normalized, Color.red);
         Debug.DrawRay(_targetPosition, Vector2.up, Color.blue);
 
     }
+
+    void RunAway()
+    {
+        if (_isPlayerDetected == false) { return; }
+        if (_isPredator)
+        {
+            if (_realHp > 20)
+            {
+                return;
+            }
+        }
+
+        Vector2 playerPos = GameManager._instance._player.transform.position;
+        Vector2 directionToPlayer = playerPos - (Vector2)transform.position;
+        Vector2 oppositeDirection = -directionToPlayer.normalized;
+
+        TargetPosition = (Vector2)transform.position + oppositeDirection * 0.1f; 
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (Vector2)TargetPosition - (Vector2)transform.position, Vector2.Distance(TargetPosition, transform.position), _obstacleLayer);
+
+        if (hit.collider == null)
+        {
+            _nextMovePosition = TargetPosition;
+        }
+        else
+        {
+            _nextMovePosition = Vector2.Reflect((hit.point - (Vector2)transform.position), hit.normal).normalized + hit.point;
+        }
+
+        Debug.DrawRay(hit.point, _nextMovePosition - hit.point, Color.blue);
+
+    }
+
 
     void GradualHpLoss()
     {
@@ -136,6 +172,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
                 gameObject.layer = LayerMask.NameToLayer("Obstacle_Collectible");
                 gameObject.AddComponent<DeadBodyItem>();
                 gameObject.GetComponent<DeadBodyItem>().SetDropItem(ObjectPool.ItemType.Meat, ObjectPool.ItemType.Bone, ObjectPool.ItemType.Leather);
+                gameObject.GetComponent<DeadBodyItem>()._ObjName = "µ¿¹°";
             }
         }
     }
@@ -179,6 +216,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     void Think()
     {
+        Random.InitState(System.DateTime.Now.Millisecond);
         if (_thinkLock == false)
         {
             _thinkTime -= Time.deltaTime;
@@ -187,8 +225,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         if (_thinkTime <= 0)
         {
             _thinkTime = Random.Range(1f, 2f);
-            _hVectorThink = Random.Range(_wanderingMinX, _wanderingMaxX);
-            _vVectorThink = Random.Range(_wanderingMinY, _wanderingMaxY);
+            _hVectorThink = Random.Range(transform.position.x - _wanderingMinX,transform.position.x - _wanderingMaxX);
+            _vVectorThink = Random.Range(transform.position.y - _wanderingMinY,transform.position.y -  _wanderingMaxY);
             TargetPosition = new Vector2(_hVectorThink, _vVectorThink) + _spawnPosition;
 
         }
@@ -275,6 +313,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     void AttackTry()
     {
+        if (_isPredator == false) { return; }
         _atkCoolDown += Time.deltaTime;
         if (_isAttack) { return; }
         if (_atkCoolDown < _atkCoolTime) { return; }

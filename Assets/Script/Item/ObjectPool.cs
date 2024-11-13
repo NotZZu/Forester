@@ -25,7 +25,13 @@ public class ObjectPool : MonoBehaviour
         Meat,
         Bone,
         Leather,
-        Fish
+        Fish,
+        Coal,
+        Fire,
+        Dust,
+        Sand,
+        Dough,
+        Brick
     }
 
     void Awake()
@@ -49,6 +55,12 @@ public class ObjectPool : MonoBehaviour
         CreatePool(ItemType.Bone, 100, itemSprites[11], "뼈", "단단함", "막대");
         CreatePool(ItemType.Leather, 100, itemSprites[12], "가죽");
         CreatePool(ItemType.Fish, 100, itemSprites[13], "물고기", "식용");
+        CreatePool(ItemType.Coal, 100, itemSprites[14], "석탄", "연료");
+        CreatePool(ItemType.Fire, 100, itemSprites[15], "불", "뜨거움");
+        CreatePool(ItemType.Dust, 100, itemSprites[16], "먼지", "가루");
+        CreatePool(ItemType.Sand, 100, itemSprites[17], "모래", "가루");
+        CreatePool(ItemType.Dough, 100, itemSprites[18], "반죽");
+        CreatePool(ItemType.Brick, 100, itemSprites[19], "벽돌", "단단함");
     }
 
     void CreatePool(ItemType itemType, int count, Sprite sprite, params string[] properties)

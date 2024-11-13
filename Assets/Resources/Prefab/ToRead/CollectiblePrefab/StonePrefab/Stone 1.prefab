@@ -49,7 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objPool: {fileID: 0}
   Speed: 20
-  _dropItemList: 03000000
+  _dropItemList: 030000000e000000
+  _objName: "\uBC14\uC704"
 --- !u!212 &1080930783772715087
 SpriteRenderer:
   m_ObjectHideFlags: 0

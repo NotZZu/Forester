@@ -103,7 +103,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
         if (_scanObject != null)
         {
-            _collectText.text = _scanObject.name + " 채집";
+            _collectText.text = _scanObject.GetComponent<MonobehaviourItem>()._ObjName + " 채집";
             _collectPanel.SetActive(true);
         }
         else
@@ -255,24 +255,26 @@ public class PlayerAction : MonoBehaviour, IAttackable
     }
     public Vector3 _smoothCamera;  // SmoothDamp 메소드 참조용(ref) 변수
 
-    void LateUpdate()
-    {
-        if (_mCamera != null)
-        {
-            Vector3 desiredPosition = transform.position;
-            desiredPosition.z = _mCamera.transform.position.z;
-            Vector3 smoothedPosition = Vector3.Lerp(_mCamera.transform.position, desiredPosition, _smoothSpeed);
-            _mCamera.transform.position = smoothedPosition;
+    //void LateUpdate()
+    //{
+    //    if (_mCamera != null)
+    //    {
+    //        Vector3 desiredPosition = transform.position;
+    //        desiredPosition.z = _mCamera.transform.position.z;
+    //        Vector3 smoothedPosition = Vector3.Lerp(_mCamera.transform.position, desiredPosition, _smoothSpeed);
+    //        _mCamera.transform.position = smoothedPosition;
 
-            // 매 프레임마다 카메라가 플레이어를 부드럽게 추적
-            //camera.transform.position = Vector3.SmoothDamp(camera.transform.position, transform.position + Vector3.back * 10, ref _smoothCamera, 0.1f);
-        }
-    }
+    //        // 매 프레임마다 카메라가 플레이어를 부드럽게 추적
+    //        //camera.transform.position = Vector3.SmoothDamp(camera.transform.position, transform.position + Vector3.back * 10, ref _smoothCamera, 0.1f);
+    //    }
+    //}
     private void OnTriggerStay2D(Collider2D collision)
     {
+        if (transform.parent != null) { return; }
         ItemInfo itemInfo = collision.GetComponent<ItemInfo>();
         if (itemInfo != null)
         {
+            Debug.Log(collision.gameObject.name);
             collision.enabled = false;
             collision.GetComponent<SpriteRenderer>().sortingOrder = 3;
             StartCoroutine(ItemAbsorb(collision.transform));
