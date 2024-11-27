@@ -8,14 +8,11 @@ public class CraftScroll : MonoBehaviour
     [SerializeField] GameObject itemButtonPrefab;
     [SerializeField] Transform content;
     private List<CombineInfo> itemList;
-    [SerializeField] ItemCombine combine;
-    [SerializeField] CraftPanel craftPanel;
     bool toggleScroll = false;
-    [SerializeField] GameObject scrollView;
 
     void Start()
     {
-        if (itemButtonPrefab == null || content == null || combine == null || scrollView == null || craftPanel == null) 
+        if (itemButtonPrefab == null || content == null || GameManager._instance._combine == null || GameManager._instance._scrollView == null || GameManager._instance._craftPanel == null) 
         {
             return; 
         }
@@ -25,11 +22,11 @@ public class CraftScroll : MonoBehaviour
     }
     IEnumerator InitializeAfterCombine()
     {
-        while (combine != null && combine.isInitialized == false)
+        while (GameManager._instance._combine != null && GameManager._instance._combine.isInitialized == false)
         {
             yield return null;
         }
-        foreach (var res in combine.combinationRules)
+        foreach (var res in GameManager._instance._combine.combinationRules)
         {
             itemList.Add(res);
         }
@@ -53,11 +50,11 @@ public class CraftScroll : MonoBehaviour
     }
     void OnItemButtonClick(CombineInfo itemName)
     {
-        craftPanel.GetComponent<CraftPanel>().OpenCraftingPanel(itemName);
+        GameManager._instance._craftPanel.GetComponent<CraftPanel>().OpenCraftingPanel(itemName);
     }
     internal void ToggleScroll()
     {
-        scrollView.SetActive(toggleScroll);
+        GameManager._instance._scrollView.SetActive(toggleScroll);
         toggleScroll = !toggleScroll;
     }
 

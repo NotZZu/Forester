@@ -15,8 +15,6 @@ public class CraftPanel : MonoBehaviour
     [SerializeField] internal Transform mainMaterialSlot;
     [SerializeField] internal Transform subMaterialSlot;
     [SerializeField] Transform objMaterialSlot;
-    [SerializeField] ItemCombine craft;
-    [SerializeField] PlayerAction player;
     ItemInfo mainMaterial;
     ItemInfo subMaterial;
     string objMaterial;
@@ -128,7 +126,9 @@ public class CraftPanel : MonoBehaviour
     {
         if (mainMaterial != null && subMaterial != null)
         {
-            player.GetItem(craft.Combine(mainMaterial, subMaterial, objMaterial));
+            ItemInfo Item = (GameManager._instance._itemCombine.Combine(mainMaterial, subMaterial, objMaterial));
+            Item._isCrafted = true;
+            Item.gameObject.transform.position = GameManager._instance._player.transform.position;
             mainMaterial = null;
             subMaterial = null;
             mainMaterialSlot.GetComponent<Image>().sprite = null;
@@ -142,13 +142,13 @@ public class CraftPanel : MonoBehaviour
     {
         if (mainMaterialSlot.GetComponent<Image>().sprite != null)
         {
-            player.GetItem(mainMaterial);
+            GameManager._instance._player.GetItem(mainMaterial);
             mainMaterialSlot.GetComponent<Image>().sprite = null;
             mainMaterial = null;
         }   
         if (subMaterialSlot.GetComponent<Image>().sprite != null)
         {
-            player.GetItem(subMaterial);
+            GameManager._instance._player.GetItem(subMaterial);
             subMaterialSlot.GetComponent<Image>().sprite = null;
             subMaterial = null;
         }

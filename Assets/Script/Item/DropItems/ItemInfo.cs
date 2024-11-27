@@ -8,10 +8,14 @@ public class ItemInfo : MonoBehaviour
     [SerializeField] internal List<string> itemAttr = new();
     [SerializeField] internal int itemAmount;
     [SerializeField] internal string itemName;
-    [SerializeField] CircleCollider2D circle;
+    internal bool _isCrafted;
+    [SerializeField] internal CircleCollider2D circle;
+    [SerializeField] internal int _itemIndex;
+    [SerializeField] internal float _itemAtk;
 
-    internal void SetProperties(Sprite s, int i, string n, params string[] l)
+    internal void SetProperties(Sprite s, int i, string n, float dmz, params string[] l)
     {
+        _itemAtk = dmz;
         itemSprite = s;
         itemAmount = i;
         itemName = n;
@@ -31,9 +35,17 @@ public class ItemInfo : MonoBehaviour
     }
     private void OnEnable()
     {
-        StartCoroutine(colliderAwake());
+        if (_isCrafted)
+        {
+            circle.enabled = true;
+        }
+        else
+        {
+            StartCoroutine(colliderAwake());
+
+        }
     }
-    private void OnDisable()
+        private void OnDisable()
     {
         circle.enabled = false;
         circle.GetComponent<SpriteRenderer>().sortingOrder = 1;

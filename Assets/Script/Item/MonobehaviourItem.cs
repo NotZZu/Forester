@@ -4,20 +4,20 @@ using System.Collections;
 
 public class MonobehaviourItem : MonoBehaviour, IObject
 {
-    [SerializeField] protected ObjectPool objPool;
     [SerializeField] float Speed = 20;
     [SerializeField] protected List<ObjectPool.ItemType> _dropItemList;
     [SerializeField] string _objName;
+    [SerializeField] internal string _requiredAttr;
     internal string _ObjName { get { return _objName; } set { _objName = value; } }
 
     void Awake()
     {
-        objPool = GameObject.Find("ObjectPool").GetComponent<ObjectPool>();
+        GameManager._instance._objPool = GameObject.Find("ObjectPool").GetComponent<ObjectPool>();
     }
         public void DropObject(Vector2 playerPos, Vector2 hitPos, GameObject hit)
     {
         ObjectPool.ItemType randomDropItem = _dropItemList[Random.Range(0, _dropItemList.Count)];
-        GameObject dropItem = objPool.GetObject(randomDropItem.ToString());
+        GameObject dropItem = GameManager._instance._objPool.GetObject(randomDropItem.ToString());
 
         if (dropItem == null)
         {
@@ -52,7 +52,7 @@ public class MonobehaviourItem : MonoBehaviour, IObject
     }
     public void SetDropItem(params ObjectPool.ItemType[] items)
     {
-        objPool = FindAnyObjectByType<ObjectPool>();
+        GameManager._instance._objPool = FindAnyObjectByType<ObjectPool>();
         _dropItemList = new();
         _dropItemList.AddRange(items);
         //foreach (var i in items)

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
 using System.Collections;
+using System.Linq;
 
 public class Manager : MonoBehaviour
 {
@@ -25,6 +26,15 @@ public class Manager : MonoBehaviour
         {
             if (inventorySlots[i].sprite == item.itemSprite)
             {
+                if (inventorySlots[i].GetComponent<ItemSlot>().itemInfo.itemAttr.Count != itemInfo.itemAttr.Count) { continue; }
+                foreach (var attr in inventorySlots[i].GetComponent<ItemSlot>().itemInfo.itemAttr)
+                {
+                    if (itemInfo.itemAttr.Contains(attr) == false)
+                    {
+                        continue;
+                    }
+                }
+                
                 int currentCount = int.Parse(inventoryTexts[i].text);
                 inventoryTexts[i].text = (currentCount + 1).ToString();
 
@@ -35,7 +45,7 @@ public class Manager : MonoBehaviour
                 }
                 //slot.itemInfo = itemInfo;
                 slot.itemInfo.itemAmount++;
-                slot.craftPanel = craftPanel; // CraftPanel 설정
+                //slot.craftPanel = craftPanel; // CraftPanel 설정
                 
                 return;
             }
@@ -46,6 +56,7 @@ public class Manager : MonoBehaviour
                 inventorySlots[i].enabled = true;
                 //inventoryTexts[i].text = itemInfo.itemAmount.ToString();
                 inventoryTexts[i].text = "1";
+                itemInfo._itemIndex = i;
                 itemInfo.itemAmount = 1;
                 inventoryTexts[i].enabled = true;
 
@@ -55,28 +66,26 @@ public class Manager : MonoBehaviour
                     slot = inventorySlots[i].gameObject.AddComponent<ItemSlot>();
                 }
                 slot.itemInfo = itemInfo;
-                slot.craftPanel = craftPanel; // CraftPanel 설정
+                //slot.craftPanel = craftPanel; // CraftPanel 설정
                 break;
             }
         }
     }
     internal void ItemDecline(ItemInfo iteminfo)
     {
-        for (int i = 0; i < inventorySlots.Length; i++)
-        {
-            if (inventorySlots[i].sprite == iteminfo.itemSprite)
-            {
+
+            //if (inventorySlots[iteminfo._itemIndex].sprite == iteminfo.itemSprite)
+            //{
                 iteminfo.itemAmount--;
-                inventoryTexts[i].text = iteminfo.itemAmount.ToString();
+                inventoryTexts[iteminfo._itemIndex].text = iteminfo.itemAmount.ToString();
                 if (iteminfo.itemAmount <= 0)
                 {
-                    inventorySlots[i].sprite = null;
-                    inventoryTexts[i].enabled = false;
+                    inventorySlots[iteminfo._itemIndex].sprite = null;
+                    inventoryTexts[iteminfo._itemIndex].enabled = false;
                     PlayerAction player = FindAnyObjectByType<PlayerAction>();
                     player.DropItem(iteminfo);
                 }
-            }
-        }
+            //}
     }
     internal void ToggleExpansion()
     {

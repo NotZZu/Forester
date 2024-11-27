@@ -47,10 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddd3ed75bdd53494dbce45aa3cef1d4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 030000000e000000
   _objName: "\uBC14\uC704"
+  _requiredAttr: "\uACE1\uAD2D\uC774"
 --- !u!212 &1080930783772715087
 SpriteRenderer:
   m_ObjectHideFlags: 0

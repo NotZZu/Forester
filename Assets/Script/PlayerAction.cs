@@ -26,23 +26,12 @@ public class PlayerAction : MonoBehaviour, IAttackable
     float _h, _v;
     Rigidbody2D _rigid;
     Animator _anime;
-    [SerializeField] GameObject _mCamera; // 카메라 SerializeField로 설정
-    float _smoothSpeed = 0.125f;
-    [SerializeField] GameObject _collectPanel;
-    [SerializeField] Text _collectText; // UI Text 컴포넌트를 추가
     GameObject _scanObject;
-    [SerializeField] Manager _manager;
     bool _hDown, _hUp;
     bool _vDown, _vUp;
     public Vector2 _dirVec;
 
     internal List<itemGrp> _bagList = new();
-    [SerializeField] GameObject _bag;
-
-    [SerializeField] MonobehaviourItem _ItemManager;
-    [SerializeField] CraftScroll _craftScroll;
-
-    [SerializeField] GameObject _realBag;
 
     bool _isAttacked;
     bool _isStun;
@@ -65,7 +54,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
     [SerializeField] Slider _hpBar;
     [SerializeField] Slider _hungerBar;
     [SerializeField] Slider _thirstBar;
-    //[SerializeField] float 
+    public GameObject _equipment;
+    [SerializeField] internal float _itemAtk;
     [SerializeField] float _atk;
     [SerializeField] float _def;
     float _realHp;
@@ -82,7 +72,6 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _rigid = GetComponent<Rigidbody2D>();
         _rigid.interpolation = RigidbodyInterpolation2D.Interpolate;
         _anime = GetComponent<Animator>();
-        _mCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
         _hungerBar.value = _hungerBar.maxValue;
         _thirstBar.value = _thirstBar.maxValue;
         _realHp = _hpBar.maxValue;
@@ -103,19 +92,24 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
         if (_scanObject != null)
         {
-            _collectText.text = _scanObject.GetComponent<MonobehaviourItem>()._ObjName + " 채집";
-            _collectPanel.SetActive(true);
+            GameManager._instance._collectPanel.SetActive(true);
+            GameManager._instance._collectPanel.GetComponentInChildren<Text>().text = _scanObject.GetComponent<MonobehaviourItem>()._ObjName + " 채집\n";
+            GameManager._instance._collectPanel.GetComponentInChildren<Text>().text += _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr == "" || 
+                _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr == null
+                ? "" :_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr + "필요";
         }
         else
         {
-            _collectPanel.SetActive(false);
+            GameManager._instance._collectPanel.SetActive(false);
         }
+        // _dirVec의 방향으로 1.0f 만큼 떨어진 지점에서부터 raycast 시작
+        Vector3 raycastStart = (Vector2)transform.position + _dirVec.normalized * 0.8f;
 
-        Debug.DrawRay(transform.position, _dirVec * 1.2f, new Color(0, 0, 0));
+        Debug.DrawRay(raycastStart, _dirVec * 1.2f, new Color(0, 0, 0));
 
 
         //combinedMask = LayerMask.GetMask("Tree", "Water", "Soil", "Branch", "Stone"); //(1 << 4) | (1 << 7) | (1 << 9) | (1 << 10) | (1 << 11);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, _dirVec, 1.2f, _combinedMask);
+        RaycastHit2D hit = Physics2D.Raycast(raycastStart, _dirVec, 1.2f, _combinedMask);
 
         if (hit.collider != null)
         {
@@ -128,6 +122,18 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
         if (Input.GetKeyDown(KeyCode.E) && _scanObject != null)
         {
+
+            if (_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr != "" && _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr != null)
+            {
+                if (_equipment == null)
+                {
+                    return;
+                }
+                    if (_equipment.GetComponent<ItemInfo>().itemAttr.Contains(_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr) == false)
+                {
+                    return;
+                }
+            }
             //scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, scanObject);
             _scanObject.GetComponent<IObject>().DropObject(transform.position, hit.point, _scanObject);
             //_ItemManager.DropObject(transform.position, hit.point, _scanObject);
@@ -136,11 +142,11 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
         if (Input.GetKeyDown(KeyCode.I))
         {
-            _manager.ToggleExpansion();
+            GameManager._instance._manager.ToggleExpansion();
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            _craftScroll.ToggleScroll();
+            GameManager._instance._craftScroll.ToggleScroll();
         }
         if (Input.GetKeyDown(KeyCode.G))
         {
@@ -196,25 +202,6 @@ public class PlayerAction : MonoBehaviour, IAttackable
     }
     void Move()
     {
-        //if (_isAttacked) { return; }
-        /*_h = Input.GetAxisRaw("Horizontal");
-        _v = Input.GetAxisRaw("Vertical");
-        _vDown = Input.GetButtonDown("Vertical");
-        _vUp = Input.GetButtonUp("Vertical");
-        _hDown = Input.GetButtonDown("Horizontal");
-        _hUp = Input.GetButtonUp("Horizontal");
-
-        // 방향 설정
-        if (_vDown && _v == 1) { _dirVec = Vector3.up; }
-        else if (_vDown && _v == -1) { _dirVec = Vector3.down; }
-        else if (_hDown && _h == -1) { _dirVec = Vector3.left; }
-        else if (_hDown && _h == 1) { _dirVec = Vector3.right; }
-        else if (_h != 0 && _v != 0) { _dirVec = new Vector3(_h, _v).normalized; }
-        else if (_hUp && _v == 1) { _dirVec = Vector3.up; }
-        else if (_hUp && _v == -1) { _dirVec = Vector3.down; }
-        else if (_vUp && _h == 1) { _dirVec = Vector3.right; }
-        else if (_vUp && _h == -1) { _dirVec = Vector3.left; }*/
-
         _h = Input.GetAxisRaw("Horizontal");
         _v = Input.GetAxisRaw("Vertical");
         Vector2 curVector = new Vector2(_h, _v).normalized;
@@ -255,19 +242,6 @@ public class PlayerAction : MonoBehaviour, IAttackable
     }
     public Vector3 _smoothCamera;  // SmoothDamp 메소드 참조용(ref) 변수
 
-    //void LateUpdate()
-    //{
-    //    if (_mCamera != null)
-    //    {
-    //        Vector3 desiredPosition = transform.position;
-    //        desiredPosition.z = _mCamera.transform.position.z;
-    //        Vector3 smoothedPosition = Vector3.Lerp(_mCamera.transform.position, desiredPosition, _smoothSpeed);
-    //        _mCamera.transform.position = smoothedPosition;
-
-    //        // 매 프레임마다 카메라가 플레이어를 부드럽게 추적
-    //        //camera.transform.position = Vector3.SmoothDamp(camera.transform.position, transform.position + Vector3.back * 10, ref _smoothCamera, 0.1f);
-    //    }
-    //}
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (transform.parent != null) { return; }
@@ -288,7 +262,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
         //    GetItem(collision);
         //}
     }
-    IEnumerator ItemAbsorb(Transform itemPos)
+    internal IEnumerator ItemAbsorb(Transform itemPos)
     {
         Vector2 here = itemPos.position;
         float coolDown = 0;
@@ -326,12 +300,12 @@ public class PlayerAction : MonoBehaviour, IAttackable
         }
         if (isFound != true)
         {
-            collision.transform.SetParent(_bag.transform);
+            collision.transform.SetParent(GameManager._instance._bag.transform);
             item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { collision.gameObject });
             _bagList.Add(item);
 
         }
-        _manager.Collect(item, itemInfo);
+        GameManager._instance._manager.Collect(item, itemInfo);
     }
     internal void GetItem(ItemInfo resultItem)
     {
@@ -352,11 +326,11 @@ public class PlayerAction : MonoBehaviour, IAttackable
         }
         if (isFound == false)
         {
-            resultItem.transform.SetParent(_bag.transform);
+            resultItem.transform.SetParent(GameManager._instance._bag.transform);
             item = new itemGrp(itemInfo.itemName, itemInfo.itemSprite, 1, new List<GameObject>() { resultItem.gameObject });
             _bagList.Add(item);
         }
-        _manager.Collect(item, itemInfo);
+        GameManager._instance._manager.Collect(item, itemInfo);
     }
     internal void DropItem(ItemInfo itemInfo)
     {
@@ -366,7 +340,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
             {
                 _bagList.RemoveAt(i);
                 ObjectPool objectPool = FindAnyObjectByType<ObjectPool>();
-                var child = _realBag.transform.GetChild(i);
+                var child = GameManager._instance._bag.transform.GetChild(i);
                 child.SetParent(objectPool.transform);
                 break;
             }
@@ -396,7 +370,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
                 _dirVec, 0.6f, LayerMask.GetMask("Animal"));
             if (hit.collider != null)
             {
-                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, 1.5f, _atk);
+                hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, 1.5f, _equipment == null ? _atk : _equipment.GetComponent<ItemInfo>()._itemAtk);
             }
             _isStun = true;
             yield return new WaitForSeconds(0.417f);

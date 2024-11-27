@@ -13,6 +13,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     [SerializeField] Animator _anime;
     Vector2 _spawnPosition;
     [SerializeField] bool _isPredator;
+
     
     bool _isAttack;
 
@@ -135,7 +136,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
             }
         }
 
-        Vector2 playerPos = GameManager._instance._player.transform.position;
+        Vector2 playerPos = _playerTransform.position;
         Vector2 directionToPlayer = playerPos - (Vector2)transform.position;
         Vector2 oppositeDirection = -directionToPlayer.normalized;
 

@@ -255,10 +255,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 701c5ae469c9acc48a4d07dbdebb7c30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 000000000400000005000000
   _objName: "\uB098\uBB34"
+  _requiredAttr: "\uB3C4\uB07C"
 --- !u!1 &8024260093156867486
 GameObject:
   m_ObjectHideFlags: 0

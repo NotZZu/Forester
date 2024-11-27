@@ -451,7 +451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _detectRange: 10
   _playerLayer: 0
-  _speed: 2.5
+  _speed: 1.5
   _anime: {fileID: 0}
   _isPredator: 0
   _wanderingMinX: -5

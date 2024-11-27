@@ -5,7 +5,6 @@ using System.Linq;
 public class ItemCombine : MonoBehaviour
 {
     internal HashSet<CombineInfo> combinationRules;
-    public ObjectPool objPool;
     public bool isInitialized = false;
 
     void Awake()
@@ -57,10 +56,10 @@ public class ItemCombine : MonoBehaviour
             {
                 rule.ResultProperty.Add(prop);
             }
-            GameObject CombinedItem = objPool.GetObject(rule.Result);
+            GameObject CombinedItem = GameManager._instance._objPool.GetObject(rule.Result, "crafted");
             ItemInfo itemInfo = CombinedItem.GetComponent<ItemInfo>();
             itemInfo.SetProperties(CombinedItem.GetComponent<SpriteRenderer>().sprite, 1,
-            rule.Result, rule.ResultProperty.ToArray());
+            rule.Result, ((mainItem._itemAtk + subItem._itemAtk) * 0.2f + itemInfo._itemAtk * 0.9f), rule.ResultProperty.ToArray());
             return itemInfo;
         }
 
