@@ -57,9 +57,13 @@ public class ItemCombine : MonoBehaviour
                 rule.ResultProperty.Add(prop);
             }
             GameObject CombinedItem = GameManager._instance._objPool.GetObject(rule.Result, "crafted");
+            float weight = (mainItem._itemKnockBack + subItem._itemKnockBack) / 10 + CombinedItem.GetComponent<ItemInfo>()._itemAtkDelay;
+            float hungerFill = mainItem._hungerFill + subItem._hungerFill;
+            float thirstFill = mainItem._hungerFill + subItem._thirstFill;
             ItemInfo itemInfo = CombinedItem.GetComponent<ItemInfo>();
             itemInfo.SetProperties(CombinedItem.GetComponent<SpriteRenderer>().sprite, 1,
-            rule.Result, ((mainItem._itemAtk + subItem._itemAtk) * 0.2f + itemInfo._itemAtk * 0.9f), rule.ResultProperty.ToArray());
+            rule.Result, ((mainItem._itemAtk + subItem._itemAtk) * 0.2f + itemInfo._itemAtk * 0.9f), weight, hungerFill, thirstFill, rule.ResultProperty.ToArray());
+            //itemInfo.SetProperties(CombinedItem.GetComponent<ItemData>());
             return itemInfo;
         }
 

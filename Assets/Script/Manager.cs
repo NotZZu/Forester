@@ -12,7 +12,7 @@ public class Manager : MonoBehaviour
     [SerializeField] Image ExInventory;
     [SerializeField] CraftPanel craftPanel; // CraftPanel 참조 추가
     bool isExpansion = false;
-    
+
     public bool isSlowMo = false;
     void Start()
     {
@@ -34,7 +34,7 @@ public class Manager : MonoBehaviour
                         continue;
                     }
                 }
-                
+
                 int currentCount = int.Parse(inventoryTexts[i].text);
                 inventoryTexts[i].text = (currentCount + 1).ToString();
 
@@ -46,7 +46,7 @@ public class Manager : MonoBehaviour
                 //slot.itemInfo = itemInfo;
                 slot.itemInfo.itemAmount++;
                 //slot.craftPanel = craftPanel; // CraftPanel 설정
-                
+
                 return;
             }
             if (inventorySlots[i].sprite == null)
@@ -74,18 +74,21 @@ public class Manager : MonoBehaviour
     internal void ItemDecline(ItemInfo iteminfo)
     {
 
-            //if (inventorySlots[iteminfo._itemIndex].sprite == iteminfo.itemSprite)
-            //{
-                iteminfo.itemAmount--;
-                inventoryTexts[iteminfo._itemIndex].text = iteminfo.itemAmount.ToString();
-                if (iteminfo.itemAmount <= 0)
-                {
-                    inventorySlots[iteminfo._itemIndex].sprite = null;
-                    inventoryTexts[iteminfo._itemIndex].enabled = false;
-                    PlayerAction player = FindAnyObjectByType<PlayerAction>();
-                    player.DropItem(iteminfo);
-                }
-            //}
+        //if (inventorySlots[iteminfo._itemIndex].sprite == iteminfo.itemSprite)
+        //{
+        iteminfo.itemAmount--;
+        inventoryTexts[iteminfo._itemIndex].text = iteminfo.itemAmount.ToString();
+        if (iteminfo.itemAmount <= 0)
+        {
+            inventorySlots[iteminfo._itemIndex].sprite = null;
+            inventoryTexts[iteminfo._itemIndex].enabled = false;
+            PlayerAction player = FindAnyObjectByType<PlayerAction>();
+            GameManager._instance._player._equipment = null;
+            GameManager._instance._equipment.gameObject.SetActive(false);
+            GameManager._instance._playerAtkCollDownBar.maxValue = 1;
+            player.DropItem(iteminfo);
+        }
+        //}
     }
     internal void ToggleExpansion()
     {
@@ -105,7 +108,7 @@ public class Manager : MonoBehaviour
     }
 
 
-        void Update()
+    void Update()
     {
         if (isSlowMo == false)
         {

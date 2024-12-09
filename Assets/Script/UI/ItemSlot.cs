@@ -11,7 +11,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     void Awake()
     {
-       // craftPanel = FindAnyObjectByType<CraftPanel>();
+        // craftPanel = FindAnyObjectByType<CraftPanel>();
         var button = gameObject.AddComponent<Button>();
         button.onClick.AddListener(OnItemClick);
 
@@ -19,7 +19,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     void OnItemClick()
     {
-        
+
         if (GameManager._instance._craftPanel.IsMainMaterialSlotSelected || GameManager._instance._craftPanel.IsSubMaterialSlotSelected)
         {
             if (GameManager._instance._craftPanel.mainMaterialSlot.GetComponent<Image>().sprite != null &&
@@ -29,40 +29,57 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             }
             if (GameManager._instance._craftPanel.IsMainMaterialSlotSelected == true)
             {
-                if (itemInfo.itemAmount <= 0)
-                {
-                    GameManager._instance._manager.ItemDecline(itemInfo);
-                    return;
-                }
+                //if (itemInfo.itemAmount <= 1)
+                //{
+                //    GameManager._instance._manager.ItemDecline(itemInfo);
+                //    return;
+                //}
                 if (GameManager._instance._craftPanel.SetMainMaterial(itemInfo))
                 {
                     GameManager._instance._manager.ItemDecline(itemInfo);
-                }
+                    if (itemInfo.itemAmount <= 1)
+                    {
+                        return;
+                    }
 
+                }
             }
             else if (GameManager._instance._craftPanel.IsSubMaterialSlotSelected == true)
             {
-                if (itemInfo.itemAmount <= 0)
-                {
-                    GameManager._instance._manager.ItemDecline(itemInfo);
-                    return;
-                }
+                //if (itemInfo.itemAmount <= 1)
+                //{
+                //    GameManager._instance._manager.ItemDecline(itemInfo);
+                //    return;
+                //}
                 if (GameManager._instance._craftPanel.SetSubMaterial(itemInfo))
                 {
                     GameManager._instance._manager.ItemDecline(itemInfo);
+                    if (itemInfo.itemAmount <= 1)
+                    {
+                        return;
+                    }
                 }
-
             }
+
         }
         Equip();
     }
     public void Equip()
     {
+        if (itemInfo.itemAttr.Contains("식용") || itemInfo.itemAttr.Contains("음용"))
+        {
+            GameManager._instance._player._hungerBar.value += itemInfo._hungerFill;
+            GameManager._instance._player._thirstBar.value += itemInfo._thirstFill;
+            GameManager._instance._manager.ItemDecline(itemInfo);
+            return;
+        }
+        
         GameManager._instance._equipment.sprite = this.itemInfo.itemSprite;
         GameManager._instance._player._equipment = this.itemInfo.gameObject;
+        GameManager._instance._playerAtkCollDownBar.maxValue = this.itemInfo._itemAtkDelay;
         GameManager._instance._equipment.gameObject.SetActive(true);
     }
-    public void OnPointerEnter(PointerEventData eventData) 
+    public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("들어옴");
         GameManager._instance._propertyNotice.SetActive(true);
@@ -78,7 +95,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         Debug.Log("나감");
         GameManager._instance._propertyNotice.SetActive(false);
     }
-    private IEnumerator TogglePropertyBox() 
+    private IEnumerator TogglePropertyBox()
     {
         toggle = !toggle;
         Text properties = GameManager._instance._propertyNotice.GetComponentInChildren<Text>();
@@ -86,15 +103,15 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         {
             properties.text = string.Join("\n", itemInfo.itemAttr);
             PositionPropertyBox();
-        } 
-        else 
-        { 
+        }
+        else
+        {
             properties.text = string.Empty;
-        } 
+        }
         foreach (Transform child in GameManager._instance._propertyNotice.transform)
         {
             child.gameObject.SetActive(toggle);
-        } 
+        }
         yield return null;
     }
     private void PositionPropertyBox()

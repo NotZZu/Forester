@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b194059aaac3454da30d103fdf7e1e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objPool: {fileID: 0}
   Speed: 20
   _dropItemList: 040000000600000005000000
   _objName: "\uC218\uD480"
+  _requiredAttr: 

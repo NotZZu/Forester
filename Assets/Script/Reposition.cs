@@ -33,7 +33,13 @@ public class Reposition : MonoBehaviour
         {
             transform.Translate(Vector3.up * dirY * 80);
         }
+
         PrefabManager asdf = FindAnyObjectByType<PrefabManager>();
-        asdf.SearchPlace(transform.position); //g
+        if (asdf == null)
+        {
+            Debug.LogError("PrefabManager 객체를 찾을 수 없습니다!");
+            return;
+        }
+        asdf.SearchPlace(transform.position);
     }
 }

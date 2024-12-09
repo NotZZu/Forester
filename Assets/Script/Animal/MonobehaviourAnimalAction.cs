@@ -1,3 +1,4 @@
+//using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -75,6 +76,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
     bool _isDead = false;
     #endregion
 
+    private AudioSource audioSource;
+    public AudioClip[] soundEffects;
 
 
     void Awake()
@@ -91,6 +94,11 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         _hpBar.gameObject.SetActive(false);
         _realHp = _hpBar.maxValue;
         _resultHp = _hpBar.maxValue;
+
+        audioSource = GetComponent<AudioSource>(); if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -169,6 +177,10 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
             {
                 _anime.SetTrigger("Dead"); // 사망 애니메이션 출력
                 _isDead = true; // 사망했음을 알림
+
+                audioSource.clip = soundEffects[1];
+                audioSource.Play();
+
                 //gameObject.layer = LayerMask.GetMask("Obstacle_Collectible"); // 이후 통행불가-채집가능 레이어로 변경하여 아이템 채집 기능활성
                 gameObject.layer = LayerMask.NameToLayer("Obstacle_Collectible");
                 gameObject.AddComponent<DeadBodyItem>();
@@ -217,7 +229,7 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
 
     void Think()
     {
-        Random.InitState(System.DateTime.Now.Millisecond);
+        UnityEngine.Random.InitState(System.DateTime.Now.Millisecond);
         if (_thinkLock == false)
         {
             _thinkTime -= Time.deltaTime;
@@ -320,6 +332,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         if (_atkCoolDown < _atkCoolTime) { return; }
         if (Vector2.Distance(transform.position, _targetPosition) <= 1.4f && _isPlayerDetected == true)
         {
+            audioSource.clip = soundEffects[0];
+            audioSource.Play();
             StartCoroutine(AsyncAttack());
             _atkCoolDown = 0;
         }
@@ -352,8 +366,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         float knockTime = 0.4f;
         float knockCoolDown = 0;
 
-        _realHp -= (damage - _def);
-        if (Mathf.Round(_realHp / _hpBar.maxValue * 100) >= 20)
+        _realHp -= (damage - damage * (_def / 20)) * (Mathf.Floor(GameManager._instance._player._hungerBar.value / 50) >= 1 ? 1 : GameManager._instance._player._hungerBar.value / 50);
+            if (Mathf.Round(_realHp / _hpBar.maxValue * 100) >= 20)
         {
             //_animalSlider.GetComponent<Animator>().SetTrigger("Auch!");
         }
@@ -362,7 +376,8 @@ public class MonobehaviourAnimalAction : MonoBehaviour, IAttackable
         _hpBarCoroutine = StartCoroutine(HpBarShow());
 
         Vector2 startPos = transform.position;
-        Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
+        Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * 
+            (GameManager._instance._player._equipment == null ? knockBackPower : GameManager._instance._player._equipment.GetComponent<ItemInfo>()._itemKnockBack);
 
         while (knockCoolDown < knockTime)
         {

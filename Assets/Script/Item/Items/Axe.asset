@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc2ad4678fd1b5b46a85142e34390f3d, type: 3}
+  m_Name: Axe
+  m_EditorClassIdentifier: 
+  itemName: Axe
+  sprite: {fileID: 21300000, guid: e21c7deccbd5a424eb9da9c91658ac31, type: 3}
+  damage: 15
+  weight: 1.5
+  properties:
+  - "\uB3C4\uB07C"
+  hungerFill: 0
+  thirstFill: 0

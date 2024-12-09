@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 internal class itemGrp
@@ -19,6 +21,7 @@ internal class itemGrp
         itemList = l;
     }
 }
+
 public class PlayerAction : MonoBehaviour, IAttackable
 {
     [SerializeField] LayerMask _combinedMask;
@@ -42,18 +45,17 @@ public class PlayerAction : MonoBehaviour, IAttackable
 
     #region 스킬 관련 필드
     [SerializeField] GameObject _skill;
-    [SerializeField] float _skill0CoolTime = 3;
+    [SerializeField] internal float _skill0CoolTime = 3;
     float _skill0CoolDown;
     [SerializeField] GameObject _skill0;
     Vector2 _lastMoveDirection;
-    [SerializeField] Slider _playerAtkCollDownBar;
     Coroutine coolDownCoroutine;
     #endregion
 
     #region status 관련 필드
     [SerializeField] Slider _hpBar;
-    [SerializeField] Slider _hungerBar;
-    [SerializeField] Slider _thirstBar;
+    [SerializeField] internal Slider _hungerBar;
+    [SerializeField] internal Slider _thirstBar;
     public GameObject _equipment;
     [SerializeField] internal float _itemAtk;
     [SerializeField] float _atk;
@@ -65,9 +67,30 @@ public class PlayerAction : MonoBehaviour, IAttackable
     [SerializeField] float _thirstTick;
     [SerializeField] Image _portrait;
     [SerializeField] float _hungerByMove;
+    [SerializeField] float minSpeedFactor = 0.1f;
+    bool _isDead = false;
     #endregion
 
-    void Awake()
+    private AudioSource audioSource;
+    public AudioClip[] soundEffects;
+
+    void Start()
+    {
+        if (GameManager._instance == null)
+        {
+            Debug.LogError("GameManager instance is null");
+            return;
+        }
+        InitializePlayer();
+    }
+
+
+    void OnEnable()
+    {
+        InitializePlayer();
+    }
+
+    void InitializePlayer()
     {
         _rigid = GetComponent<Rigidbody2D>();
         _rigid.interpolation = RigidbodyInterpolation2D.Interpolate;
@@ -76,12 +99,26 @@ public class PlayerAction : MonoBehaviour, IAttackable
         _thirstBar.value = _thirstBar.maxValue;
         _realHp = _hpBar.maxValue;
         _resultHp = _hpBar.maxValue;
-        _playerAtkCollDownBar.maxValue = _skill0CoolTime;
-        _playerAtkCollDownBar.gameObject.SetActive(false);
-        //StartCoroutine(CheckPlayerHp());
+
+        if (GameManager._instance != null)
+        {
+            GameManager._instance._playerAtkCollDownBar.maxValue = _skill0CoolTime;
+            GameManager._instance._playerAtkCollDownBar.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("GameManager instance is null");
+        }
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
-    void Update()
+
+void Update()
     {
         living();
 
@@ -94,9 +131,9 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             GameManager._instance._collectPanel.SetActive(true);
             GameManager._instance._collectPanel.GetComponentInChildren<Text>().text = _scanObject.GetComponent<MonobehaviourItem>()._ObjName + " 채집\n";
-            GameManager._instance._collectPanel.GetComponentInChildren<Text>().text += _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr == "" || 
+            GameManager._instance._collectPanel.GetComponentInChildren<Text>().text += _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr == "" ||
                 _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr == null
-                ? "" :_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr + "필요";
+                ? "" : _scanObject.GetComponent<MonobehaviourItem>()._requiredAttr + "필요";
         }
         else
         {
@@ -129,7 +166,7 @@ public class PlayerAction : MonoBehaviour, IAttackable
                 {
                     return;
                 }
-                    if (_equipment.GetComponent<ItemInfo>().itemAttr.Contains(_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr) == false)
+                if (_equipment.GetComponent<ItemInfo>().itemAttr.Contains(_scanObject.GetComponent<MonobehaviourItem>()._requiredAttr) == false)
                 {
                     return;
                 }
@@ -148,12 +185,12 @@ public class PlayerAction : MonoBehaviour, IAttackable
         {
             GameManager._instance._craftScroll.ToggleScroll();
         }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
-            _portrait.GetComponent<Animator>().SetTrigger("Auch!");
-            Resources.Load<MonobehaviourItem>("Prefab/bear");
-        }
+        //if (Input.GetKeyDown(KeyCode.G))
+        //{
+        //    _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
+        //    _portrait.GetComponent<Animator>().SetTrigger("Auch!");
+        //    Resources.Load<MonobehaviourItem>("Prefab/bear");
+        //}
 
         //Vector3 ve = new Vector3(h, v);
         //rigid.linearVelocity = new Vector2(h, v) * Speed;
@@ -172,8 +209,23 @@ public class PlayerAction : MonoBehaviour, IAttackable
     //}
     void living()
     {
-        _hungerBar.value -= _hungerTick * Time.deltaTime;
-        _thirstBar.value -= _thirstTick * Time.deltaTime;
+        if (_hungerBar.value > 0)
+        {
+            _hungerBar.value -= _hungerTick * Time.deltaTime;
+        }
+        else
+        {
+            _hpBar.value -= _hungerTick * Time.deltaTime;
+        }
+        if (_thirstBar.value > 0)
+        {
+            _thirstBar.value -= _thirstTick * Time.deltaTime;
+        }
+        else
+        {
+            _hpBar.value -= _thirstTick * Time.deltaTime;
+        }
+
     }
     void warningLessValue()
     {
@@ -192,14 +244,51 @@ public class PlayerAction : MonoBehaviour, IAttackable
     }
     void GradualHpLoss()
     {
-        
         if (_resultHp != _realHp)
         {
             _resultHp = Mathf.MoveTowards(_resultHp, _realHp, lossSpeed * Time.deltaTime);
             if (Mathf.Abs(_realHp - _resultHp) <= 0.001) { _resultHp = _realHp; }
             _hpBar.value = _resultHp;
         }
+
+        if (_hpBar.value <= _hpBar.minValue && !_isDead)
+        {
+            _isDead = true;
+
+            audioSource.clip = soundEffects[2];
+            audioSource.Play();
+
+            // Light 색상 점진적 변경 시작
+            StartCoroutine(FadeToBlack());
+
+        }
     }
+
+    IEnumerator FadeToBlack()
+    {
+        Light2D gameLight = FindAnyObjectByType<Light2D>();
+        if (gameLight != null)
+        {
+            float duration = 2.0f; // 변경이 완료될 때까지 걸리는 시간 (초)
+            Color initialColor = gameLight.color;
+            Color targetColor = Color.black;
+            float time = 0;
+
+            while (time < duration)
+            {
+                gameLight.color = Color.Lerp(initialColor, targetColor, time / duration);
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            gameLight.color = targetColor; // 최종 색상 설정
+
+            PlayerPrefs.SetFloat("passedTime", GameManager._instance.passedTime);
+            SceneManager.LoadScene("EndScene");
+        }
+    }
+
+
     void Move()
     {
         _h = Input.GetAxisRaw("Horizontal");
@@ -231,7 +320,8 @@ public class PlayerAction : MonoBehaviour, IAttackable
         //Vector3 ve = new Vector3(h, v);
         if (_isAttacked) { return; }
         Vector2 curVector = new Vector2(_h, _v);
-        _rigid.linearVelocity = curVector * _speed; // 실질적인 플레이어 움직임
+        _rigid.linearVelocity = curVector * _speed * Mathf.Max(minSpeedFactor, (Mathf.Floor(_thirstBar.value / 50) >= 1 ? 1 : _thirstBar.value / 50));
+        // 실질적인 플레이어 움직임 목마름이 50 미만이면 목마름 수치에 따라 이동속도 감소
         if (curVector != Vector2.zero)
         {
             _lastMoveDirection = curVector;
@@ -350,11 +440,14 @@ public class PlayerAction : MonoBehaviour, IAttackable
     void Attack()
     {
         _skill0CoolDown += Time.deltaTime;
-        _playerAtkCollDownBar.value = _skill0CoolDown;
-        if (Input.GetKeyDown(KeyCode.Space) && _skill0CoolDown > _skill0CoolTime)
+        GameManager._instance._playerAtkCollDownBar.value = _skill0CoolDown;
+        if (Input.GetKeyDown(KeyCode.Space) && (_equipment == null ? _skill0CoolDown >
+            _skill0CoolTime : _skill0CoolDown > _equipment.GetComponent<ItemInfo>()._itemAtkDelay))
         {
             StartCoroutine(AsyncAttack());
             if (coolDownCoroutine != null) { StopCoroutine(coolDownCoroutine); }
+            audioSource.clip = soundEffects[0];
+            audioSource.Play();
             coolDownCoroutine = StartCoroutine(ShowAtkCoolDown());
             _skill0CoolDown = 0;
             _hungerBar.value -= _hungerByMove;
@@ -363,27 +456,29 @@ public class PlayerAction : MonoBehaviour, IAttackable
         IEnumerator AsyncAttack()
         {
             float _skillShotAngle = Mathf.Rad2Deg * Mathf.Acos(Vector2.Dot(Vector2.up, (_dirVec).normalized));
-            if (_dirVec.x > 0) { _skillShotAngle = 360 - _skillShotAngle; }
-            _skill.transform.rotation = Quaternion.Euler(0f, 0f, _skillShotAngle);
-            _skill0.SetActive(true);
-            RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(1.1f, 0.6f), _skill.transform.rotation.z,
-                _dirVec, 0.6f, LayerMask.GetMask("Animal"));
+            if (_dirVec.x > 0)
+            {
+                _skillShotAngle = 360 - _skillShotAngle;
+            }
+            
+            _skill.transform.rotation = Quaternion.Euler(0f, 0f, _skillShotAngle); _skill0.SetActive(true);
+            RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(1.1f, 0.6f), _skill.transform.rotation.z, _dirVec, 0.6f, LayerMask.GetMask("Animal"));
             if (hit.collider != null)
             {
                 hit.collider.GetComponent<IAttackable>().Attacked((Vector2)transform.position, 1.5f, _equipment == null ? _atk : _equipment.GetComponent<ItemInfo>()._itemAtk);
             }
+            //GameManager._instance._player._equipment
             _isStun = true;
             yield return new WaitForSeconds(0.417f);
             _skill0.SetActive(false);
-            yield return new WaitForSeconds(0.083f);
-            _isStun = false;
+            yield return new WaitForSeconds(0.083f); _isStun = false;
         }
 
         IEnumerator ShowAtkCoolDown()
         {
-            _playerAtkCollDownBar.gameObject.SetActive(true);
-            yield return new WaitForSeconds(_skill0CoolTime + 0.3f);
-            _playerAtkCollDownBar.gameObject.SetActive(false);
+            GameManager._instance._playerAtkCollDownBar.gameObject.SetActive(true);
+            yield return new WaitForSeconds((_equipment == null ? _skill0CoolDown : _equipment.GetComponent<ItemInfo>()._itemAtkDelay) + 0.3f);
+            GameManager._instance._playerAtkCollDownBar.gameObject.SetActive(false);
         }
 
     }
@@ -406,9 +501,11 @@ public class PlayerAction : MonoBehaviour, IAttackable
             float asdf = Mathf.Round((damage - _def) / _realHp * 100);
             _hpBar.GetComponent<Animator>().SetTrigger("Auch!");
             _portrait.GetComponent<Animator>().SetTrigger("Auch!");
+            audioSource.clip = soundEffects[1];
+            audioSource.Play();
         }
         _realHp -= (damage - _def);
-        
+
 
         Vector2 startPos = transform.position;
         Vector2 endPos = (Vector2)transform.position + ((Vector2)transform.position - attacker).normalized * knockBackPower;
